@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2a78d6">
+<title>Neurology Residency Explorer</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f3f4f6; --card:#ffffff; --card2:#f7f8fa; --line:#e3e5e8; --grid:#eceef1;
+  --text:#0b0b0b; --text2:#52514e; --muted:#7b7a75;
+  --accent:#2a78d6; --accent-soft:#e6f0fc; --accent-ink:#1c5cab;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --good:#0ca30c; --good-ink:#006300; --warn:#fab219; --bad:#d03b3b;
+  --seq1:#cde2fb; --seq2:#86b6ef; --seq3:#2a78d6; --seq4:#184f95;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);
+  --radius:16px;
+  --hero1:#1c5cab; --hero2:#2a78d6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0f1011; --card:#1a1a19; --card2:#222221; --line:#2e2e2c; --grid:#2a2a28;
+    --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e86;
+    --accent:#3987e5; --accent-soft:#1b2a3d; --accent-ink:#9ec5f4;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    --good:#0ca30c; --good-ink:#4fc94f;
+    --seq1:#184f95; --seq2:#256abf; --seq3:#3987e5; --seq4:#86b6ef;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+    --hero1:#0d366b; --hero2:#1c5cab;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0f1011; --card:#1a1a19; --card2:#222221; --line:#2e2e2c; --grid:#2a2a28;
+  --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e86;
+  --accent:#3987e5; --accent-soft:#1b2a3d; --accent-ink:#9ec5f4;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  --good:#0ca30c; --good-ink:#4fc94f;
+  --seq1:#184f95; --seq2:#256abf; --seq3:#3987e5; --seq4:#86b6ef;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+  --hero1:#0d366b; --hero2:#1c5cab;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow-x:hidden}
+button,select,input,textarea{font:inherit;color:inherit}
+h1,h2,h3,h4{margin:0;letter-spacing:-.01em}
+h2{font-size:1.25rem}
+h3{font-size:1.02rem}
+a{color:var(--accent)}
+.num{font-variant-numeric:tabular-nums}
+
+/* header */
+header.top{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.bar{max-width:1240px;margin:0 auto;padding:10px 16px 0;display:flex;align-items:center;gap:12px}
+.logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--hero2),var(--hero1));display:grid;place-items:center;color:#fff;flex:none}
+.title{flex:1;min-width:0}
+.title h1{font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.title p{margin:0;color:var(--text2);font-size:.8rem}
+.iconbtn{border:1px solid var(--line);background:var(--card);border-radius:10px;height:36px;min-width:36px;padding:0 10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+nav.tabs{max-width:1240px;margin:0 auto;padding:10px 16px 10px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{flex:none;border:0;background:transparent;color:var(--text2);padding:7px 13px;border-radius:999px;cursor:pointer;font-weight:550;font-size:.9rem;white-space:nowrap}
+nav.tabs button:hover{background:var(--card)}
+nav.tabs button.on{background:var(--text);color:var(--bg)}
+
+main{max-width:1240px;margin:0 auto;padding:18px 16px 60px}
+section.view{display:none;animation:fade .25s ease}
+section.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.vhead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.vhead p{margin:4px 0 0;color:var(--text2);font-size:.9rem;max-width:720px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:900px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.g2,.g3{grid-template-columns:minmax(0,1fr)}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);min-width:0}
+.card h3{margin-bottom:2px}
+.card .sub{color:var(--text2);font-size:.82rem;margin:0 0 12px}
+.mt{margin-top:14px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:.85rem;font-weight:550;user-select:none;-webkit-user-select:none}
+.pill.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.pill:disabled{opacity:.45;cursor:not-allowed}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:.88rem}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn:hover{filter:brightness(.97)}
+select.sel{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;max-width:100%}
+.tag{display:inline-block;background:var(--accent-soft);color:var(--accent-ink);border-radius:999px;padding:3px 10px;font-size:.78rem;font-weight:600;margin:0 6px 6px 0}
+.estimate{display:inline-flex;gap:6px;align-items:center;font-size:.76rem;color:var(--text2);background:var(--card2);border:1px dashed var(--line);border-radius:8px;padding:4px 8px}
+.muted{color:var(--muted)}
+.small{font-size:.82rem}
+.banner{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:12px;padding:10px 14px;font-size:.84rem;color:var(--text2);margin-bottom:14px}
+
+/* top program cards */
+.topcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.pcard{position:relative;cursor:pointer;transition:transform .2s ease}
+.pcard:hover{transform:translateY(-2px)}
+.rankbadge{position:absolute;top:14px;right:14px;font-weight:800;font-size:1.6rem;color:var(--muted);opacity:.5}
+.pcard>div:nth-child(2){padding-right:44px}
+.pcard .loc{color:var(--text2);font-size:.8rem}
+.bigscore{font-size:2.2rem;font-weight:750;letter-spacing:-.03em;line-height:1;margin:10px 0 2px}
+.minis{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.mini{background:var(--card2);border-radius:10px;padding:6px 8px}
+.mini b{display:block;font-size:1rem}
+.mini span{font-size:.7rem;color:var(--text2)}
+
+/* stat tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.tile{padding:14px;cursor:pointer}
+.tile .lab{font-size:.76rem;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;font-weight:650}
+.tile .val{font-size:1.05rem;font-weight:700;margin-top:6px}
+.tile .meta{font-size:.78rem;color:var(--muted)}
+
+/* bar chart */
+.hbar{position:relative}
+.hbar .r{position:absolute;left:0;right:0;display:grid;grid-template-columns:var(--lab,128px) 1fr 46px;gap:8px;align-items:center;transition:top .6s cubic-bezier(.2,.8,.2,1);cursor:pointer}
+.hbar .r .l{font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.hbar .r .t{height:100%;display:flex;align-items:center}
+.hbar .r .f{height:16px;border-radius:0 4px 4px 0;background:var(--seq3);transition:width .6s cubic-bezier(.2,.8,.2,1),background .3s}
+.hbar .r.hl .f{background:var(--s2)}
+.hbar .r:hover .f{filter:brightness(1.12)}
+.hbar .r .v{font-size:.8rem;text-align:right;color:var(--text2)}
+.hbar .r.hl .l{font-weight:700}
+.hbar .axis{position:absolute;top:0;bottom:0;width:1px;background:var(--grid)}
+@media (max-width:640px){.hbar .r{grid-template-columns:var(--labm,96px) 1fr 40px}}
+
+/* sliders */
+.sliders{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 18px}
+.sl{padding:6px 0}
+.sl .h{display:flex;justify-content:space-between;font-size:.85rem;font-weight:600}
+.sl .h span{color:var(--accent);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent);height:28px;margin:0}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:.85rem}
+.tbl th,.tbl td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl th{font-size:.74rem;color:var(--text2);text-transform:uppercase;letter-spacing:.03em;font-weight:650}
+.tbl td.best{color:var(--good-ink);font-weight:750}
+.tbl tr.sec td{background:var(--card2);font-weight:700;text-align:left;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--text2)}
+.tblwrap{overflow-x:auto}
+@media (max-width:640px){.tbl{font-size:.78rem}.tbl th,.tbl td{padding:6px 3px}}
+
+/* meters */
+.meters{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px 18px}
+.meter{font-size:.84rem}
+.meter .h{display:flex;justify-content:space-between}
+.meter .h b{font-variant-numeric:tabular-nums}
+.meter .tr{height:7px;background:var(--grid);border-radius:4px;margin-top:4px;overflow:hidden}
+.meter .tr i{display:block;height:100%;background:var(--seq3);border-radius:4px;transition:width .6s}
+.meter.inv .tr i{background:var(--s2)}
+
+/* profile hero */
+.hero{border-radius:var(--radius);overflow:hidden;position:relative;color:#fff;min-height:190px;display:flex;align-items:flex-end;padding:20px;background:linear-gradient(135deg,var(--hero1),var(--hero2))}
+.hero svg.sky{position:absolute;inset:0;width:100%;height:100%;opacity:.22}
+.hero .crest{width:72px;height:72px;border-radius:18px;background:rgba(255,255,255,.16);border:2px dashed rgba(255,255,255,.55);display:grid;place-items:center;font-weight:800;font-size:1.4rem;flex:none}
+.hero .inner{position:relative;display:flex;gap:16px;align-items:center;width:100%;flex-wrap:wrap}
+.hero h2{font-size:1.7rem}
+.hero .ph{position:absolute;top:12px;right:14px;font-size:.72rem;opacity:.75;border:1px dashed rgba(255,255,255,.6);border-radius:8px;padding:3px 8px}
+.hero .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.hero .chips span{background:rgba(255,255,255,.16);border-radius:999px;padding:3px 10px;font-size:.8rem}
+ul.clean{margin:0;padding-left:18px}
+ul.clean li{margin:4px 0}
+
+/* map */
+.mapwrap{position:relative;border-radius:12px;overflow:hidden;background:var(--card2);touch-action:none}
+.mapwrap svg{display:block;width:100%;height:auto;cursor:grab}
+.mapwrap svg.drag{cursor:grabbing}
+.land{fill:var(--card);stroke:var(--muted);stroke-width:1.2;vector-effect:non-scaling-stroke}
+.lake{fill:var(--card2);stroke:var(--muted);stroke-width:.8;vector-effect:non-scaling-stroke}
+.pin{cursor:pointer}
+.pin circle.dot{fill:var(--s2);stroke:var(--card);stroke-width:2;vector-effect:non-scaling-stroke}
+.pin.on circle.dot{fill:var(--accent)}
+.pin text{font-size:11px;fill:var(--text);paint-order:stroke;stroke:var(--card2);stroke-width:3px;font-weight:600;pointer-events:none}
+.mapctl{position:absolute;left:10px;bottom:10px;display:flex;flex-direction:column;gap:6px}
+.mapctl button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:1.1rem;font-weight:700}
+
+/* tooltip */
+#tip{position:fixed;z-index:200;pointer-events:none;background:var(--text);color:var(--bg);padding:7px 10px;border-radius:8px;font-size:.8rem;max-width:240px;opacity:0;transition:opacity .12s;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+#tip.on{opacity:1}
+#tip b{display:block}
+
+/* svg charts */
+svg.chart{width:100%;height:auto;display:block;overflow:visible}
+svg.chart text{fill:var(--text2);font-size:11px}
+svg.chart .gridl{stroke:var(--grid);stroke-width:1}
+svg.chart .axisl{stroke:var(--line)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--text2);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* tiers */
+.tiers{display:grid;gap:10px}
+.tier{border:2px dashed var(--line);border-radius:14px;padding:10px;min-height:64px;transition:background .15s,border-color .15s}
+.tier.over,.tier.target{border-color:var(--accent);background:var(--accent-soft)}
+.tier h4{font-size:.85rem;margin-bottom:8px;display:flex;justify-content:space-between}
+.chipz{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:.84rem;font-weight:600;cursor:grab;user-select:none;-webkit-user-select:none}
+.chip.sel{outline:2px solid var(--accent);background:var(--accent-soft)}
+
+/* rank list */
+.rl{list-style:none;margin:0;padding:0}
+.rl li{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--line)}
+.rl .n{width:26px;font-weight:800;color:var(--muted);text-align:right}
+.rl .nm{flex:1;min-width:0;font-weight:600}
+.rl .nm small{display:block;font-weight:400;color:var(--text2)}
+.rl button{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--card);cursor:pointer}
+.delta{font-size:.74rem;font-weight:700;border-radius:6px;padding:2px 6px;background:var(--card2);color:var(--text2)}
+
+/* battle */
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}
+.vs .side{text-align:center}
+.vs .side .sc{font-size:2.4rem;font-weight:800}
+.vs .mid{font-weight:800;color:var(--muted)}
+.brow{display:grid;grid-template-columns:1fr 120px 1fr;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:.86rem}
+.brow .c{text-align:center;color:var(--text2);font-size:.78rem}
+.brow .a,.brow .b{font-variant-numeric:tabular-nums}
+.brow .a{text-align:right}
+.brow .w{color:var(--good-ink);font-weight:800}
+@media (max-width:640px){.brow{grid-template-columns:1fr 92px 1fr}}
+
+/* notes */
+textarea{width:100%;min-height:84px;border:1px solid var(--line);border-radius:10px;background:var(--card2);padding:10px;resize:vertical}
+label.fl{display:block;font-weight:650;font-size:.85rem;margin:0 0 6px}
+.saved{font-size:.78rem;color:var(--good-ink);opacity:0;transition:opacity .3s}
+.saved.on{opacity:1}
+
+/* gut check */
+.gq{display:grid;grid-template-columns:1fr 54px;gap:6px 12px;align-items:center}
+.gauge{font-size:3rem;font-weight:800;letter-spacing:-.04em}
+.sim{text-align:center;padding:26px 16px}
+.envelope{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text2)}
+.simname{font-size:2rem;font-weight:800;margin:10px 0 4px;letter-spacing:-.02em}
+.react{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+
+/* edit form */
+.editgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px 12px}
+.editgrid label{font-size:.78rem;color:var(--text2);display:block}
+.editgrid input{width:100%;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--card2)}
+details summary{cursor:pointer;font-weight:650}
+
+.profnav{flex-wrap:nowrap}.profnav select{flex:1;min-width:0}
+.pin.nyc text{display:var(--nyclab,inline)}
+.footer{color:var(--muted);font-size:.78rem;text-align:center;margin-top:30px}
+@media (max-width:640px){
+  .bar{padding-top:8px}
+  .title p{display:none}
+  .hero h2{font-size:1.35rem}
+  .bigscore{font-size:1.9rem}
+  .card{padding:14px}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="bar">
+    <div class="logo" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.5 3a3.5 3.5 0 0 0-3.4 4.3A3.5 3.5 0 0 0 4 13.5a3.5 3.5 0 0 0 3 5.2A3 3 0 0 0 12 20V4.5A2.5 2.5 0 0 0 9.5 3z"/><path d="M14.5 3a3.5 3.5 0 0 1 3.4 4.3 3.5 3.5 0 0 1 2.1 6.2 3.5 3.5 0 0 1-3 5.2A3 3 0 0 1 12 20"/></svg></div>
+    <div class="title"><h1>Neurology Residency Decision Explorer</h1><p>Match planning dashboard · 18 programs</p></div>
+    <button class="iconbtn" id="themeBtn" title="Toggle dark / light mode" aria-label="Toggle theme"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></button>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+<main id="main">
+  <div class="banner" id="estBanner"><button class="iconbtn" style="float:right;height:28px;min-width:28px;margin:-2px -4px 0 8px" aria-label="Hide notice" onclick="S.bannerHidden=true;save();this.parentNode.remove()">✕</button><b>Heads up:</b> every salary, rent, tax rate and 1–10 rating here is a <b>starter estimate</b>, not an official figure. Open any program under <b>Profiles → Edit data</b> to replace them with what you learn on interview day. Everything saves on this device.</div>
+
+<div id="nojs">
+<div class="card" style="border-left:4px solid var(--accent);margin-bottom:14px"><h2 style="margin-bottom:6px">📱 You're seeing a preview</h2>
+<p style="margin:0 0 8px">This is an interactive app, but message and file previews (like iPhone Messages or Quick Look) can't run it. Below is a read-only summary of all 18 programs.</p>
+<p style="margin:0" class="small"><b>To use the full app</b> (sliders, rankings, map, charts, notes): open this file in <b>Safari, Chrome or Edge</b> on a computer by double-clicking it, or in <b>Chrome</b> on Android. On iPhone, the preview can't run it, so use a computer or a web link to the app.</p></div>
+<div class="card"><h3>All 18 programs at a glance</h3><p class="sub">Starter estimates, not official figures. PGY-1 salary, 1-BR rent per month, and 1–10 ratings.</p>
+<div class="tblwrap"><table class="tbl"><thead><tr><th>Program</th><th>Salary</th><th>Rent</th><th>Prestige</th><th>Happy</th><th>Weather</th></tr></thead><tbody>
+<tr><td><b>Johns Hopkins</b><div class="small muted">Baltimore, MD</div></td><td>$72.0k</td><td>$1.7k</td><td>10</td><td>7</td><td>6</td></tr><tr><td><b>Penn (HUP)</b><div class="small muted">Philadelphia, PA</div></td><td>$76.0k</td><td>$1.9k</td><td>10</td><td>8</td><td>6</td></tr><tr><td><b>Columbia</b><div class="small muted">New York, NY</div></td><td>$95.0k</td><td>$3.5k</td><td>10</td><td>7</td><td>6</td></tr><tr><td><b>Weill Cornell</b><div class="small muted">New York, NY</div></td><td>$95.0k</td><td>$3.9k</td><td>9</td><td>8</td><td>6</td></tr><tr><td><b>NYU Langone</b><div class="small muted">New York, NY</div></td><td>$92.0k</td><td>$3.8k</td><td>9</td><td>8</td><td>6</td></tr><tr><td><b>Mount Sinai</b><div class="small muted">New York, NY</div></td><td>$92.0k</td><td>$3.6k</td><td>9</td><td>7</td><td>6</td></tr><tr><td><b>Vanderbilt</b><div class="small muted">Nashville, TN</div></td><td>$67.0k</td><td>$1.8k</td><td>9</td><td>9</td><td>7</td></tr><tr><td><b>Emory</b><div class="small muted">Atlanta, GA</div></td><td>$67.0k</td><td>$1.8k</td><td>9</td><td>8</td><td>8</td></tr><tr><td><b>Mayo Clinic Jacksonville</b><div class="small muted">Jacksonville, FL</div></td><td>$73.0k</td><td>$1.6k</td><td>8</td><td>9</td><td>9</td></tr><tr><td><b>Brown</b><div class="small muted">Providence, RI</div></td><td>$72.0k</td><td>$2.0k</td><td>7</td><td>8</td><td>5</td></tr><tr><td><b>Dartmouth</b><div class="small muted">Lebanon, NH</div></td><td>$75.0k</td><td>$1.9k</td><td>7</td><td>8</td><td>3</td></tr><tr><td><b>University of Virginia</b><div class="small muted">Charlottesville, VA</div></td><td>$67.0k</td><td>$1.6k</td><td>8</td><td>9</td><td>7</td></tr><tr><td><b>Wake Forest</b><div class="small muted">Winston-Salem, NC</div></td><td>$65.0k</td><td>$1.3k</td><td>7</td><td>8</td><td>7</td></tr><tr><td><b>USF Morsani</b><div class="small muted">Tampa, FL</div></td><td>$66.0k</td><td>$1.8k</td><td>6</td><td>8</td><td>9</td></tr><tr><td><b>University of Florida</b><div class="small muted">Gainesville, FL</div></td><td>$63.0k</td><td>$1.4k</td><td>7</td><td>8</td><td>8</td></tr><tr><td><b>University of Miami</b><div class="small muted">Miami, FL</div></td><td>$68.0k</td><td>$2.7k</td><td>7</td><td>7</td><td>9</td></tr><tr><td><b>Boston University</b><div class="small muted">Boston, MA</div></td><td>$80.0k</td><td>$3.2k</td><td>8</td><td>8</td><td>5</td></tr><tr><td><b>UT Health San Antonio</b><div class="small muted">San Antonio, TX</div></td><td>$64.0k</td><td>$1.3k</td><td>6</td><td>8</td><td>7</td></tr>
+</tbody></table></div></div>
+<h3 style="margin:18px 0 10px">Program snapshots</h3>
+<div class="grid g2"><div class="card"><h3>Johns Hopkins</h3><p class="sub">Baltimore, Maryland · MD ~4.75% + Baltimore City ~3.2%</p><p class="small" style="margin-top:0">A historic powerhouse with one of the largest neurology departments in the country, deep subspecialty bench strength and a research engine that opens doors everywhere.</p><div><span class="tag">Academic Neurologist</span><span class="tag">Future Researcher</span><span class="tag">Fellowship-Oriented Applicant</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Name recognition that carries into any fellowship or faculty search</li><li>Depth in nearly every subspecialty, including neuroimmunology and neuromuscular</li><li>Huge, complex inpatient volume</li><li>Strong physician-scientist pathways</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Demanding culture with a reputation for long hours</li><li>Baltimore neighborhood safety varies a lot block to block</li><li>Big program can feel less personal without proactive mentoring</li></ul></div><div class="card"><h3>Penn (HUP)</h3><p class="sub">Philadelphia, Pennsylvania · PA 3.07% + Philadelphia wage tax ~3.75%</p><p class="small" style="margin-top:0">Elite, broad department at HUP with outstanding subspecialty depth, especially cognitive, movement and epilepsy, in a lively and still relatively affordable big city.</p><div><span class="tag">Academic Neurologist</span><span class="tag">Future Researcher</span><span class="tag">Fellowship-Oriented Applicant</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Top-tier research across cognitive, movement disorders and epilepsy</li><li>Collegial reputation for a program of its size</li><li>Philadelphia: big-city food and culture at lower cost than NYC or Boston</li><li>Easy train access to NYC and DC</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Philadelphia wage tax on top of state tax</li><li>High-acuity, busy services</li><li>Some neighborhoods feel less safe</li></ul></div><div class="card"><h3>Columbia</h3><p class="sub">New York, New York · NY ~6.3% + NYC ~3.9%</p><p class="small" style="margin-top:0">The Neurological Institute of New York: a storied department with enormous tertiary referral volume and top research, in Washington Heights.</p><div><span class="tag">Academic Neurologist</span><span class="tag">Future Researcher</span><span class="tag">Fellowship-Oriented Applicant</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Historic flagship neurology institute</li><li>Massive and diverse patient population</li><li>Strong stroke, neuro ICU and neuromuscular programs</li><li>New York's unmatched culture and dining</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Highest cost of living on the list; salary does not fully offset it</li><li>Commute and housing logistics in Manhattan</li><li>Busy, high-intensity training</li></ul></div><div class="card"><h3>Weill Cornell</h3><p class="sub">New York, New York · NY ~6.3% + NYC ~3.9%</p><p class="small" style="margin-top:0">NewYork-Presbyterian/Weill Cornell on the Upper East Side: a smaller-feeling academic program inside a major NYC system, with strong neuro-oncology and headache.</p><div><span class="tag">Academic Neurologist</span><span class="tag">Lifestyle-Focused Resident (NYC style)</span><span class="tag">Fellowship-Oriented Applicant</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Close-knit class size within a big-name system</li><li>Upper East Side location with subsidized housing options (verify)</li><li>Strong ties to Memorial Sloan Kettering for neuro-oncology</li><li>Shares NYP network with Columbia</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Very high cost of living</li><li>Smaller program means less volume in some niches</li><li>NYC pace isn't for everyone</li></ul></div><div class="card"><h3>NYU Langone</h3><p class="sub">New York, New York · NY ~6.3% + NYC ~3.9%</p><p class="small" style="margin-top:0">NYU Langone is a fast-rising academic center with a renowned comprehensive epilepsy center, strong MS care and Bellevue's public-hospital volume.</p><div><span class="tag">Academic Neurologist</span><span class="tag">Epilepsy-Focused</span><span class="tag">Fellowship-Oriented Applicant</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Elite epilepsy and EMU program</li><li>Bellevue offers safety-net, high-pathology training</li><li>Modern facilities and strong institutional resources</li><li>Excellent fellowship pipeline</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>NYC cost of living</li><li>Multiple sites can mean a lot of moving around</li><li>Busy services</li></ul></div><div class="card"><h3>Mount Sinai</h3><p class="sub">New York, New York · NY ~6.3% + NYC ~3.9%</p><p class="small" style="margin-top:0">Mount Sinai pairs strong MS/neuroimmunology and stroke with a diverse East Harlem/Upper East Side patient base and a large health system.</p><div><span class="tag">Academic Neurologist</span><span class="tag">MS / Neuroimmunology Interest</span><span class="tag">Future Researcher</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Nationally known MS center</li><li>Interventional and stroke strength</li><li>Large network gives broad case exposure</li><li>Close to Central Park</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>NYC costs</li><li>Large system can feel spread out</li><li>Some residents report heavy workloads (verify on interview day)</li></ul></div><div class="card"><h3>Vanderbilt</h3><p class="sub">Nashville, Tennessee · No state wage income tax</p><p class="small" style="margin-top:0">A top academic program in fast-growing Nashville with a reputation for happy residents, strong mentorship and no state income tax.</p><div><span class="tag">Academic Neurologist</span><span class="tag">Lifestyle-Focused Resident</span><span class="tag">Fellowship-Oriented Applicant</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Well-regarded resident culture and mentorship</li><li>Strong across stroke, epilepsy and movement</li><li>Nashville: great food, music and growing airport</li><li>No state income tax on wages</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Nashville rents have climbed fast</li><li>Car-dependent city</li><li>Summers are hot and humid</li></ul></div><div class="card"><h3>Emory</h3><p class="sub">Atlanta, Georgia · GA flat ~5.2–5.4%</p><p class="small" style="margin-top:0">High-volume, high-pathology training through Grady and Emory hospitals, with a nationally prominent stroke program in Atlanta.</p><div><span class="tag">Clinical Workhorse</span><span class="tag">Stroke-Focused</span><span class="tag">Fellowship-Oriented Applicant</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Grady gives exceptional stroke and acute-care volume</li><li>Strong fellowship placement</li><li>Atlanta: world's busiest airport, big food scene</li><li>Warm weather</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Traffic and car dependence</li><li>Grady workload can be heavy</li><li>Safety varies by neighborhood</li></ul></div><div class="card"><h3>Mayo Clinic Jacksonville</h3><p class="sub">Jacksonville, Florida · No state income tax</p><p class="small" style="margin-top:0">A smaller, well-resourced Mayo program in Jacksonville with excellent faculty-to-resident ratio and a beach-adjacent lifestyle.</p><div><span class="tag">Lifestyle-Focused Resident</span><span class="tag">Fellowship-Oriented Applicant</span><span class="tag">Mentorship Seeker</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Mayo brand and resources</li><li>Very high faculty attention per resident</li><li>Beaches and sunshine; no state income tax</li><li>Generally well-supported, lower burnout reputation</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Smaller program means less safety-net pathology</li><li>Jacksonville is spread out and car-dependent</li><li>Fewer big-city cultural options</li></ul></div><div class="card"><h3>Brown</h3><p class="sub">Providence, Rhode Island · RI ~3.75–4.75% brackets</p><p class="small" style="margin-top:0">Rhode Island Hospital is the state's main tertiary center and Level 1 trauma site, giving strong stroke and acute exposure in compact, walkable Providence.</p><div><span class="tag">Clinical Workhorse</span><span class="tag">Lifestyle-Focused Resident</span><span class="tag">Stroke-Focused</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Sole regional referral center means broad pathology</li><li>Strong stroke program</li><li>Providence: good food, walkable, near Boston</li><li>Collegial mid-sized program</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Less name recognition than the top tier</li><li>Cold winters</li><li>Rent has risen</li></ul></div><div class="card"><h3>Dartmouth</h3><p class="sub">Lebanon, New Hampshire · No state wage income tax</p><p class="small" style="margin-top:0">Rural academic medicine in the Upper Valley of New Hampshire: very supportive, close-knit and outdoorsy, with great work-life balance.</p><div><span class="tag">Lifestyle-Focused Resident</span><span class="tag">Outdoors Lover</span><span class="tag">Mentorship Seeker</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Small, supportive, family-like program</li><li>Exceptional outdoor recreation and safety</li><li>No state wage income tax</li><li>Low burnout reputation</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Long, cold, dark winters</li><li>Limited dining, shopping and nightlife</li><li>Small regional airport</li></ul></div><div class="card"><h3>University of Virginia</h3><p class="sub">Charlottesville, Virginia · VA top bracket 5.75%</p><p class="small" style="margin-top:0">A strong academic program in a beautiful college town, known for collegiality, good mentorship and a broad clinical base as the region's tertiary center.</p><div><span class="tag">Academic Neurologist</span><span class="tag">Lifestyle-Focused Resident</span><span class="tag">Mentorship Seeker</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Happy, supportive culture</li><li>Strong epilepsy and movement programs</li><li>Charlottesville: safe, scenic, wineries and mountains</li><li>Reasonable cost of living</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Small airport; drives to DC/Richmond for flights</li><li>Limited big-city amenities</li><li>Smaller fellowship network than the top tier</li></ul></div><div class="card"><h3>Wake Forest</h3><p class="sub">Winston-Salem, North Carolina · NC flat ~4.25%</p><p class="small" style="margin-top:0">Atrium Health Wake Forest Baptist offers solid academic training, strong movement disorders and cognitive neurology, and very affordable living.</p><div><span class="tag">Lifestyle-Focused Resident</span><span class="tag">Saver</span><span class="tag">Clinical Workhorse</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Very affordable rent and cost of living</li><li>Strong movement disorders and memory care</li><li>Supportive mid-sized program</li><li>Close to mountains and Charlotte/Raleigh</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Small-city amenities</li><li>Limited airport access</li><li>Lower national name recognition</li></ul></div><div class="card"><h3>USF Morsani</h3><p class="sub">Tampa, Florida · No state income tax</p><p class="small" style="margin-top:0">USF trains residents at Tampa General and partner sites, with high-volume clinical exposure and an outstanding Florida lifestyle.</p><div><span class="tag">Lifestyle-Focused Resident</span><span class="tag">Clinical Workhorse</span><span class="tag">Sunshine Seeker</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Tampa: beaches, sunshine, great airport</li><li>No state income tax</li><li>Busy tertiary hospital for strong clinical volume</li><li>Growing, energetic program</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Less research prestige</li><li>Hurricane season</li><li>Rents have risen quickly in Tampa</li></ul></div><div class="card"><h3>University of Florida</h3><p class="sub">Gainesville, Florida · No state income tax</p><p class="small" style="margin-top:0">UF Health Shands is a major academic referral center with strong epilepsy and movement disorders programs, in an affordable college town.</p><div><span class="tag">Academic Neurologist</span><span class="tag">Saver</span><span class="tag">Movement Disorders Interest</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Well-known movement disorders and DBS program</li><li>Affordable Gainesville living</li><li>No state income tax</li><li>Large referral catchment</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>College-town feel, limited big-city amenities</li><li>Small airport</li><li>Hot summers</li></ul></div><div class="card"><h3>University of Miami</h3><p class="sub">Miami, Florida · No state income tax</p><p class="small" style="margin-top:0">Jackson Memorial/UM offers enormous, diverse volume and strong neuro ICU, stroke and MS exposure in one of America's most vibrant cities.</p><div><span class="tag">Clinical Workhorse</span><span class="tag">Stroke-Focused</span><span class="tag">Big-City Lifestyle</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Huge, diverse patient population (great for Spanish speakers)</li><li>Excellent volume and pathology</li><li>World-class food, beaches and nightlife</li><li>No state income tax</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>High rent for Florida</li><li>Traffic</li><li>Busy county hospital workload</li></ul></div><div class="card"><h3>Boston University</h3><p class="sub">Boston, Massachusetts · MA flat 5%</p><p class="small" style="margin-top:0">Boston Medical Center is New England's largest safety-net hospital: excellent clinical training, strong neuromuscular and cognitive programs, in a top medical city.</p><div><span class="tag">Clinical Workhorse</span><span class="tag">Academic Neurologist</span><span class="tag">Big-City Lifestyle</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Safety-net patient population with rich pathology</li><li>Boston's huge academic network for research and networking</li><li>Walkable city, excellent airport</li><li>Strong cognitive/Alzheimer's research presence</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Very high rent</li><li>Cold winters</li><li>Busy safety-net workload</li></ul></div><div class="card"><h3>UT Health San Antonio</h3><p class="sub">San Antonio, Texas · No state income tax</p><p class="small" style="margin-top:0">University Health/UT Health San Antonio serves a vast South Texas catchment, giving strong clinical volume, affordable living and no state income tax.</p><div><span class="tag">Clinical Workhorse</span><span class="tag">Saver</span><span class="tag">Lifestyle-Focused Resident</span></div><p class="small" style="margin:8px 0 2px"><b>Strengths</b></p><ul class="clean small"><li>Very high clinical volume and acuity</li><li>Low cost of living; no state income tax</li><li>Diverse, largely Hispanic patient population</li><li>Friendly, supportive culture</li></ul><p class="small" style="margin:8px 0 2px"><b>Tradeoffs</b></p><ul class="clean small"><li>Less national research brand</li><li>Very hot summers</li><li>Car-dependent, far from the East Coast</li></ul></div></div>
+</div>
+  <section class="view" id="v-dashboard"></section>
+  <section class="view" id="v-compare"></section>
+  <section class="view" id="v-rankings"></section>
+  <section class="view" id="v-maps"></section>
+  <section class="view" id="v-lifestyle"></section>
+  <section class="view" id="v-neuro"></section>
+  <section class="view" id="v-finance"></section>
+  <section class="view" id="v-profiles"></section>
+  <section class="view" id="v-matchday"></section>
+  <section class="view" id="v-notes"></section>
+
+  <div class="footer">Runs fully offline · All figures are editable estimates · Data stays in this browser (use Notes → Backup to move it between devices)</div>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+"use strict";
+/* ============================================================
+   DATA — all figures are STARTER ESTIMATES (late 2025/2026),
+   not official numbers. Ratings are 1–10 subjective impressions.
+   Everything is editable in-app (Profiles → Edit data).
+   ============================================================ */
+const FIELDS = {
+  // reputation & program
+  prestige:"Prestige", academic:"Academic reputation", research:"Research", fellowships:"Fellowship placement",
+  clinical:"Clinical training", mentorship:"Mentorship",
+  // resident life
+  residentHappiness:"Resident happiness", camaraderie:"Camaraderie", facultySupport:"Faculty support",
+  wellness:"Wellness", burnoutRisk:"Burnout risk (higher = worse)", workLife:"Work-life balance",
+  // neurology
+  stroke:"Stroke", neuroICU:"Neuro ICU", epilepsy:"Epilepsy", emu:"EMU", dbs:"DBS",
+  movementDisorders:"Movement disorders", ms:"MS / neuroimmunology", neuromuscular:"Neuromuscular",
+  headache:"Headache", sleep:"Sleep", cognitive:"Cognitive neurology", neuroOnc:"Neuro-oncology",
+  // lifestyle
+  weather:"Weather", dining:"Dining / food scene", shopping:"Shopping", walkability:"Walkability",
+  safety:"Safety", airport:"Airport access", outdoor:"Outdoor recreation", entertainment:"Entertainment",
+  familyManual:"Family proximity (manual)"
+};
+const RATING_KEYS = Object.keys(FIELDS);
+const NEURO_KEYS = ["stroke","neuroICU","epilepsy","emu","dbs","movementDisorders","ms","neuromuscular","headache","sleep","cognitive","neuroOnc"];
+const LIFE_KEYS = ["weather","dining","shopping","walkability","safety","airport","outdoor","entertainment"];
+const REP_KEYS = ["prestige","academic","research","fellowships","clinical","mentorship"];
+const RES_KEYS = ["residentHappiness","camaraderie","facultySupport","mentorship","wellness","burnoutRisk","workLife"];
+const MONEY = {salary:"PGY-1 salary ($)", rent:"1-BR rent / month ($)", col:"Cost-of-living index (US = 100)", stateTax:"State + local income tax (% est.)"};
+
+// order: prestige academic research fellowships clinical mentorship | happy camaraderie faculty wellness burnout workLife
+//        | stroke nicu epi emu dbs move ms nm headache sleep cog onc | weather dining shop walk safety airport outdoor ent
+const RAW = [
+ ["hopkins","Johns Hopkins","JHU","Baltimore","Maryland","MD",39.297,-76.592, [10,10,10,10,9,8, 7,7,8,6,7,5, 10,10,9,9,9,9,10,10,8,8,9,9, 6,8,7,7,4,8,6,7], 72000,1700,102,7.0,"MD ~4.75% + Baltimore City ~3.2%"],
+ ["penn","Penn (HUP)","Penn","Philadelphia","Pennsylvania","PA",39.950,-75.193, [10,10,10,10,9,9, 8,8,9,7,6,6, 10,10,10,9,10,10,9,9,8,9,10,9, 6,9,8,9,5,9,6,8], 76000,1900,106,6.8,"PA 3.07% + Philadelphia wage tax ~3.75%"],
+ ["columbia","Columbia","CU","New York","New York","NY",40.841,-73.942, [10,10,10,10,10,8, 7,8,8,6,7,5, 10,10,10,10,9,10,9,10,8,8,10,9, 6,10,10,10,6,10,6,10], 95000,3500,180,10.2,"NY ~6.3% + NYC ~3.9%"],
+ ["cornell","Weill Cornell","WCM","New York","New York","NY",40.765,-73.954, [9,9,9,9,9,8, 8,8,8,7,6,6, 9,9,9,8,8,8,9,8,9,8,9,9, 6,10,10,10,7,10,6,10], 95000,3900,190,10.2,"NY ~6.3% + NYC ~3.9%"],
+ ["nyu","NYU Langone","NYU","New York","New York","NY",40.742,-73.974, [9,9,9,9,9,8, 8,8,8,7,6,6, 9,9,10,10,8,9,9,9,9,9,9,9, 6,10,10,10,7,10,6,10], 92000,3800,190,10.2,"NY ~6.3% + NYC ~3.9%"],
+ ["sinai","Mount Sinai","MSH","New York","New York","NY",40.790,-73.953, [9,9,9,9,9,8, 7,8,8,7,7,5, 9,9,9,8,9,9,10,9,8,8,9,8, 6,10,10,10,7,10,6,10], 92000,3600,185,10.2,"NY ~6.3% + NYC ~3.9%"],
+ ["vanderbilt","Vanderbilt","VU","Nashville","Tennessee","TN",36.142,-86.800, [9,9,9,9,9,9, 9,9,9,8,5,7, 9,9,9,9,9,9,8,9,8,8,8,8, 7,9,8,6,6,8,7,9], 67000,1750,104,0,"No state wage income tax"],
+ ["emory","Emory","EU","Atlanta","Georgia","GA",33.792,-84.322, [9,9,9,9,10,8, 8,8,8,7,6,6, 10,9,9,9,9,9,8,9,8,8,9,8, 8,9,9,6,6,10,7,8], 67000,1750,104,5.2,"GA flat ~5.2–5.4%"],
+ ["mayojax","Mayo Clinic Jacksonville","MCJ","Jacksonville","Florida","FL",30.264,-81.441, [8,8,8,8,8,9, 9,9,9,9,4,8, 9,8,9,9,8,8,9,9,8,9,8,8, 9,7,7,4,7,6,9,6], 73000,1550,97,0,"No state income tax"],
+ ["brown","Brown","BRN","Providence","Rhode Island","RI",41.811,-71.409, [7,8,7,7,8,8, 8,8,8,8,5,7, 9,8,9,8,8,8,8,8,8,7,8,7, 5,8,6,8,7,6,7,6], 72000,2000,110,4.5,"RI ~3.75–4.75% brackets"],
+ ["dartmouth","Dartmouth","DH","Lebanon","New Hampshire","NH",43.676,-72.272, [7,8,7,7,7,9, 8,9,9,8,4,8, 7,7,7,7,7,7,8,7,7,7,7,7, 3,5,4,6,10,4,10,4], 75000,1900,110,0,"No state wage income tax"],
+ ["uva","University of Virginia","UVA","Charlottesville","Virginia","VA",38.031,-78.499, [8,8,8,8,8,9, 9,9,9,8,5,7, 8,8,9,9,8,9,8,8,9,7,8,7, 7,7,5,7,8,5,9,6], 67000,1650,106,5.0,"VA top bracket 5.75%"],
+ ["wake","Wake Forest","WF","Winston-Salem","North Carolina","NC",36.090,-80.268, [7,7,7,7,8,8, 8,8,8,8,5,7, 8,8,8,8,8,9,8,8,7,8,9,7, 7,6,6,5,7,5,8,5], 65000,1300,92,4.25,"NC flat ~4.25%"],
+ ["usf","USF Morsani","USF","Tampa","Florida","FL",27.937,-82.459, [6,6,6,6,8,8, 8,8,8,8,5,7, 8,8,8,8,7,7,8,8,7,7,7,7, 9,8,8,5,6,9,9,8], 66000,1800,101,0,"No state income tax"],
+ ["uf","University of Florida","UF","Gainesville","Florida","FL",29.640,-82.344, [7,7,7,7,8,8, 8,8,8,8,5,7, 8,8,9,8,8,9,7,7,7,8,7,7, 8,6,6,6,7,5,8,6], 63000,1350,95,0,"No state income tax"],
+ ["miami","University of Miami","UM","Miami","Florida","FL",25.790,-80.212, [7,7,8,7,9,7, 7,8,7,7,6,6, 9,8,9,9,8,8,9,9,8,7,8,8, 9,10,9,6,6,10,8,10], 68000,2700,125,0,"No state income tax"],
+ ["bu","Boston University","BU","Boston","Massachusetts","MA",42.335,-71.073, [8,8,7,8,9,8, 8,8,8,7,6,6, 9,8,8,8,7,8,8,9,8,8,9,7, 5,9,9,9,7,10,7,9], 80000,3200,150,5.0,"MA flat 5%"],
+ ["uthsa","UT Health San Antonio","UTH","San Antonio","Texas","TX",29.508,-98.578, [6,6,7,6,9,8, 8,8,8,8,6,7, 8,8,8,8,7,8,8,7,7,7,8,7, 7,8,7,4,6,6,6,7], 64000,1300,90,0,"No state income tax"]
+];
+
+const TEXT = {
+ hopkins:{d:"A historic powerhouse with one of the largest neurology departments in the country, deep subspecialty bench strength and a research engine that opens doors everywhere.",
+  best:["Academic Neurologist","Future Researcher","Fellowship-Oriented Applicant"],
+  s:["Name recognition that carries into any fellowship or faculty search","Depth in nearly every subspecialty, including neuroimmunology and neuromuscular","Huge, complex inpatient volume","Strong physician-scientist pathways"],
+  c:["Demanding culture with a reputation for long hours","Baltimore neighborhood safety varies a lot block to block","Big program can feel less personal without proactive mentoring"],
+  love:"Someone who wants maximum academic firepower and thrives on intensity.",
+  care:"Anyone whose top priority is a calm lifestyle, short hours or a quiet city."},
+ penn:{d:"Elite, broad department at HUP with outstanding subspecialty depth, especially cognitive, movement and epilepsy, in a lively and still relatively affordable big city.",
+  best:["Academic Neurologist","Future Researcher","Fellowship-Oriented Applicant"],
+  s:["Top-tier research across cognitive, movement disorders and epilepsy","Collegial reputation for a program of its size","Philadelphia: big-city food and culture at lower cost than NYC or Boston","Easy train access to NYC and DC"],
+  c:["Philadelphia wage tax on top of state tax","High-acuity, busy services","Some neighborhoods feel less safe"],
+  love:"An academically ambitious applicant who also wants a real city life without NYC prices.",
+  care:"Someone who dislikes urban living or wants the warmest possible weather."},
+ columbia:{d:"The Neurological Institute of New York: a storied department with enormous tertiary referral volume and top research, in Washington Heights.",
+  best:["Academic Neurologist","Future Researcher","Fellowship-Oriented Applicant"],
+  s:["Historic flagship neurology institute","Massive and diverse patient population","Strong stroke, neuro ICU and neuromuscular programs","New York's unmatched culture and dining"],
+  c:["Highest cost of living on the list; salary does not fully offset it","Commute and housing logistics in Manhattan","Busy, high-intensity training"],
+  love:"An applicant who wants top academics and to live in New York.",
+  care:"Anyone sensitive to cost of living, small apartments or city stress."},
+ cornell:{d:"NewYork-Presbyterian/Weill Cornell on the Upper East Side: a smaller-feeling academic program inside a major NYC system, with strong neuro-oncology and headache.",
+  best:["Academic Neurologist","Lifestyle-Focused Resident (NYC style)","Fellowship-Oriented Applicant"],
+  s:["Close-knit class size within a big-name system","Upper East Side location with subsidized housing options (verify)","Strong ties to Memorial Sloan Kettering for neuro-oncology","Shares NYP network with Columbia"],
+  c:["Very high cost of living","Smaller program means less volume in some niches","NYC pace isn't for everyone"],
+  love:"Someone who wants NYC plus a tighter-knit program feel.",
+  care:"Anyone prioritizing savings or space."},
+ nyu:{d:"NYU Langone is a fast-rising academic center with a renowned comprehensive epilepsy center, strong MS care and Bellevue's public-hospital volume.",
+  best:["Academic Neurologist","Epilepsy-Focused","Fellowship-Oriented Applicant"],
+  s:["Elite epilepsy and EMU program","Bellevue offers safety-net, high-pathology training","Modern facilities and strong institutional resources","Excellent fellowship pipeline"],
+  c:["NYC cost of living","Multiple sites can mean a lot of moving around","Busy services"],
+  love:"An applicant drawn to epilepsy or a mix of private and public hospital training in NYC.",
+  care:"Anyone trying to maximize savings."},
+ sinai:{d:"Mount Sinai pairs strong MS/neuroimmunology and stroke with a diverse East Harlem/Upper East Side patient base and a large health system.",
+  best:["Academic Neurologist","MS / Neuroimmunology Interest","Future Researcher"],
+  s:["Nationally known MS center","Interventional and stroke strength","Large network gives broad case exposure","Close to Central Park"],
+  c:["NYC costs","Large system can feel spread out","Some residents report heavy workloads (verify on interview day)"],
+  love:"Someone excited about neuroimmunology and NYC.",
+  care:"Anyone wanting a small-town or budget-friendly experience."},
+ vanderbilt:{d:"A top academic program in fast-growing Nashville with a reputation for happy residents, strong mentorship and no state income tax.",
+  best:["Academic Neurologist","Lifestyle-Focused Resident","Fellowship-Oriented Applicant"],
+  s:["Well-regarded resident culture and mentorship","Strong across stroke, epilepsy and movement","Nashville: great food, music and growing airport","No state income tax on wages"],
+  c:["Nashville rents have climbed fast","Car-dependent city","Summers are hot and humid"],
+  love:"Someone who wants strong academics and a fun, livable city.",
+  care:"Anyone who wants to be in the Northeast or needs walkability."},
+ emory:{d:"High-volume, high-pathology training through Grady and Emory hospitals, with a nationally prominent stroke program in Atlanta.",
+  best:["Clinical Workhorse","Stroke-Focused","Fellowship-Oriented Applicant"],
+  s:["Grady gives exceptional stroke and acute-care volume","Strong fellowship placement","Atlanta: world's busiest airport, big food scene","Warm weather"],
+  c:["Traffic and car dependence","Grady workload can be heavy","Safety varies by neighborhood"],
+  love:"Someone who wants maximum hands-on clinical volume and stroke exposure.",
+  care:"Anyone wanting a lighter workload or walkable city life."},
+ mayojax:{d:"A smaller, well-resourced Mayo program in Jacksonville with excellent faculty-to-resident ratio and a beach-adjacent lifestyle.",
+  best:["Lifestyle-Focused Resident","Fellowship-Oriented Applicant","Mentorship Seeker"],
+  s:["Mayo brand and resources","Very high faculty attention per resident","Beaches and sunshine; no state income tax","Generally well-supported, lower burnout reputation"],
+  c:["Smaller program means less safety-net pathology","Jacksonville is spread out and car-dependent","Fewer big-city cultural options"],
+  love:"Someone who wants great mentorship, a brand name and a relaxed coastal life.",
+  care:"Someone who craves huge volume or an urban social scene."},
+ brown:{d:"Rhode Island Hospital is the state's main tertiary center and Level 1 trauma site, giving strong stroke and acute exposure in compact, walkable Providence.",
+  best:["Clinical Workhorse","Lifestyle-Focused Resident","Stroke-Focused"],
+  s:["Sole regional referral center means broad pathology","Strong stroke program","Providence: good food, walkable, near Boston","Collegial mid-sized program"],
+  c:["Less name recognition than the top tier","Cold winters","Rent has risen"],
+  love:"An applicant who wants solid clinical training in a smaller New England city.",
+  care:"Someone prioritizing top-tier research brand."},
+ dartmouth:{d:"Rural academic medicine in the Upper Valley of New Hampshire: very supportive, close-knit and outdoorsy, with great work-life balance.",
+  best:["Lifestyle-Focused Resident","Outdoors Lover","Mentorship Seeker"],
+  s:["Small, supportive, family-like program","Exceptional outdoor recreation and safety","No state wage income tax","Low burnout reputation"],
+  c:["Long, cold, dark winters","Limited dining, shopping and nightlife","Small regional airport"],
+  love:"Someone who skis, hikes and values community over city life.",
+  care:"Anyone who needs a city, warm weather or easy flights home."},
+ uva:{d:"A strong academic program in a beautiful college town, known for collegiality, good mentorship and a broad clinical base as the region's tertiary center.",
+  best:["Academic Neurologist","Lifestyle-Focused Resident","Mentorship Seeker"],
+  s:["Happy, supportive culture","Strong epilepsy and movement programs","Charlottesville: safe, scenic, wineries and mountains","Reasonable cost of living"],
+  c:["Small airport; drives to DC/Richmond for flights","Limited big-city amenities","Smaller fellowship network than the top tier"],
+  love:"Someone who wants academics plus a calm, beautiful town.",
+  care:"Someone who wants big-city energy."},
+ wake:{d:"Atrium Health Wake Forest Baptist offers solid academic training, strong movement disorders and cognitive neurology, and very affordable living.",
+  best:["Lifestyle-Focused Resident","Saver","Clinical Workhorse"],
+  s:["Very affordable rent and cost of living","Strong movement disorders and memory care","Supportive mid-sized program","Close to mountains and Charlotte/Raleigh"],
+  c:["Small-city amenities","Limited airport access","Lower national name recognition"],
+  love:"Someone who wants to save money and train well in a calm setting.",
+  care:"Someone chasing elite prestige or nightlife."},
+ usf:{d:"USF trains residents at Tampa General and partner sites, with high-volume clinical exposure and an outstanding Florida lifestyle.",
+  best:["Lifestyle-Focused Resident","Clinical Workhorse","Sunshine Seeker"],
+  s:["Tampa: beaches, sunshine, great airport","No state income tax","Busy tertiary hospital for strong clinical volume","Growing, energetic program"],
+  c:["Less research prestige","Hurricane season","Rents have risen quickly in Tampa"],
+  love:"Someone who wants strong clinical training and a great Florida lifestyle.",
+  care:"Future physician-scientists aiming for top research jobs."},
+ uf:{d:"UF Health Shands is a major academic referral center with strong epilepsy and movement disorders programs, in an affordable college town.",
+  best:["Academic Neurologist","Saver","Movement Disorders Interest"],
+  s:["Well-known movement disorders and DBS program","Affordable Gainesville living","No state income tax","Large referral catchment"],
+  c:["College-town feel, limited big-city amenities","Small airport","Hot summers"],
+  love:"Someone who wants solid academic training while keeping costs low.",
+  care:"Someone who wants a big-city lifestyle."},
+ miami:{d:"Jackson Memorial/UM offers enormous, diverse volume and strong neuro ICU, stroke and MS exposure in one of America's most vibrant cities.",
+  best:["Clinical Workhorse","Stroke-Focused","Big-City Lifestyle"],
+  s:["Huge, diverse patient population (great for Spanish speakers)","Excellent volume and pathology","World-class food, beaches and nightlife","No state income tax"],
+  c:["High rent for Florida","Traffic","Busy county hospital workload"],
+  love:"Someone who wants high volume and a big, sunny, international city.",
+  care:"Someone sensitive to high rents or seeking a quiet lifestyle."},
+ bu:{d:"Boston Medical Center is New England's largest safety-net hospital: excellent clinical training, strong neuromuscular and cognitive programs, in a top medical city.",
+  best:["Clinical Workhorse","Academic Neurologist","Big-City Lifestyle"],
+  s:["Safety-net patient population with rich pathology","Boston's huge academic network for research and networking","Walkable city, excellent airport","Strong cognitive/Alzheimer's research presence"],
+  c:["Very high rent","Cold winters","Busy safety-net workload"],
+  love:"Someone who wants Boston and wants to be clinically excellent.",
+  care:"Someone focused on savings or warm weather."},
+ uthsa:{d:"University Health/UT Health San Antonio serves a vast South Texas catchment, giving strong clinical volume, affordable living and no state income tax.",
+  best:["Clinical Workhorse","Saver","Lifestyle-Focused Resident"],
+  s:["Very high clinical volume and acuity","Low cost of living; no state income tax","Diverse, largely Hispanic patient population","Friendly, supportive culture"],
+  c:["Less national research brand","Very hot summers","Car-dependent, far from the East Coast"],
+  love:"Someone who wants top clinical volume and big savings.",
+  care:"Someone who needs to stay near the East Coast."}
+};
+
+const FAMILY_CITIES = [
+ ["Not set (use manual ratings)",null,null],["Atlanta, GA",33.75,-84.39],["Austin, TX",30.27,-97.74],["Baltimore, MD",39.29,-76.61],["Birmingham, AL",33.52,-86.80],["Boston, MA",42.36,-71.06],["Charlotte, NC",35.23,-80.84],["Chicago, IL",41.88,-87.63],["Cleveland, OH",41.50,-81.69],["Columbus, OH",39.96,-83.00],["Dallas, TX",32.78,-96.80],["Denver, CO",39.74,-104.99],["Detroit, MI",42.33,-83.05],["Hartford, CT",41.76,-72.67],["Houston, TX",29.76,-95.37],["Indianapolis, IN",39.77,-86.16],["Jacksonville, FL",30.33,-81.66],["Kansas City, MO",39.10,-94.58],["Los Angeles, CA",34.05,-118.24],["Miami, FL",25.76,-80.19],["Minneapolis, MN",44.98,-93.27],["Nashville, TN",36.16,-86.78],["New Orleans, LA",29.95,-90.07],["New York, NY",40.71,-74.01],["Orlando, FL",28.54,-81.38],["Philadelphia, PA",39.95,-75.17],["Phoenix, AZ",33.45,-112.07],["Pittsburgh, PA",40.44,-79.99],["Providence, RI",41.82,-71.41],["Raleigh, NC",35.78,-78.64],["Richmond, VA",37.54,-77.44],["San Antonio, TX",29.42,-98.49],["San Francisco, CA",37.77,-122.42],["Seattle, WA",47.61,-122.33],["St. Louis, MO",38.63,-90.20],["Tampa, FL",27.95,-82.46],["Washington, DC",38.91,-77.04]
+];
+
+const BASE = RAW.map(r=>{
+  const keys=["prestige","academic","research","fellowships","clinical","mentorship","residentHappiness","camaraderie","facultySupport","wellness","burnoutRisk","workLife",...NEURO_KEYS,...LIFE_KEYS];
+  const o={id:r[0],name:r[1],abbr:r[2],city:r[3],state:r[4],st:r[5],lat:r[6],lon:r[7],salary:r[9],rent:r[10],col:r[11],stateTax:r[12],taxNote:r[13],familyManual:5};
+  keys.forEach((k,i)=>o[k]=r[8][i]);
+  const t=TEXT[o.id]; o.description=t.d; o.bestFor=t.best; o.strengths=t.s; o.concerns=t.c; o.loves=t.love; o.careful=t.care;
+  return o;
+});
+
+// US outline (lon,lat), simplified for offline drawing
+const US_OUTLINE=[[-124.7,48.4],[-123.2,48.2],[-122.8,49.0],[-95.2,49.0],[-94.8,49.3],[-94.6,48.7],[-93.0,48.6],[-91.4,48.1],[-89.6,48.0],[-90.9,46.9],[-92.0,46.7],[-90.4,46.6],[-87.6,46.4],[-86.0,46.6],[-84.5,46.5],[-84.1,46.2],[-83.5,46.0],[-84.4,45.6],[-83.4,45.2],[-83.3,44.3],[-83.9,43.9],[-83.5,43.6],[-82.6,43.9],[-82.4,43.0],[-82.5,42.6],[-83.1,42.1],[-83.4,41.7],[-82.5,41.4],[-81.6,41.5],[-80.5,42.0],[-79.0,42.6],[-78.9,42.9],[-79.2,43.3],[-78.0,43.4],[-76.3,43.5],[-76.2,44.2],[-75.0,44.8],[-71.5,45.0],[-71.1,45.3],[-70.8,45.4],[-70.0,46.7],[-69.2,47.4],[-68.2,47.3],[-67.8,47.1],[-67.8,45.7],[-67.0,44.8],[-68.8,44.3],[-69.8,43.8],[-70.2,43.7],[-70.7,42.9],[-70.6,42.6],[-71.0,42.3],[-70.5,41.8],[-70.0,41.8],[-69.95,41.6],[-70.6,41.5],[-71.4,41.4],[-72.9,41.3],[-73.7,40.9],[-73.0,40.95],[-72.0,41.1],[-71.9,40.95],[-73.9,40.55],[-74.0,40.4],[-74.1,39.8],[-74.9,38.95],[-75.5,39.4],[-75.1,38.8],[-75.1,38.3],[-75.4,37.9],[-75.9,37.2],[-76.3,37.0],[-75.9,36.6],[-75.5,35.2],[-76.5,34.7],[-77.9,33.9],[-79.2,33.2],[-80.8,32.1],[-81.4,30.7],[-81.3,29.9],[-80.6,28.4],[-80.0,26.7],[-80.1,25.8],[-80.4,25.2],[-81.1,25.1],[-81.7,25.9],[-82.2,26.7],[-82.8,27.9],[-82.7,28.9],[-83.7,29.9],[-84.3,30.0],[-85.4,29.7],[-86.5,30.4],[-88.0,30.5],[-89.4,30.2],[-89.6,29.2],[-90.2,29.1],[-91.3,29.3],[-93.8,29.7],[-94.8,29.3],[-96.6,28.3],[-97.4,27.4],[-97.2,25.9],[-99.1,26.4],[-99.5,27.5],[-100.3,28.3],[-101.4,29.8],[-102.4,29.8],[-103.1,29.0],[-104.5,29.6],[-106.5,31.8],[-108.2,31.8],[-108.2,31.3],[-111.1,31.3],[-114.8,32.5],[-117.1,32.5],[-117.3,33.2],[-118.4,33.8],[-119.5,34.4],[-120.6,34.6],[-121.9,36.3],[-122.4,37.2],[-122.5,37.8],[-123.0,38.0],[-123.7,38.9],[-124.4,40.4],[-124.2,41.8],[-124.5,42.8],[-124.0,44.6],[-123.9,46.2],[-124.1,46.9],[-124.7,48.4]];
+const LAKE_MI=[[-87.8,41.6],[-87.2,41.65],[-86.6,42.2],[-86.2,43.2],[-86.5,44.0],[-85.6,45.1],[-85.0,45.8],[-86.0,45.95],[-87.0,45.6],[-87.6,44.6],[-87.9,43.0]];
+// rough state borders (lines) for orientation
+const BORDERS=[
+ [[-117.0,49.0],[-117.0,46.0],[-116.9,45.6],[-116.5,45.5],[-117.0,44.3],[-117.0,42.0],[-124.2,42.0]],
+ [[-120.0,42.0],[-120.0,39.0],[-114.6,35.0],[-114.6,32.7]],
+ [[-111.05,49.0],[-111.05,45.0],[-111.05,41.0],[-109.05,41.0],[-109.05,31.3]],
+ [[-114.0,42.0],[-114.0,37.0],[-109.05,37.0],[-103.0,37.0],[-94.6,37.0],[-89.5,36.5],[-81.7,36.6],[-75.9,36.55]],
+ [[-104.05,49.0],[-104.05,41.0],[-102.05,41.0],[-102.05,37.0]],[[-103.0,37.0],[-103.0,32.0],[-106.6,32.0]],
+ [[-103.0,36.5],[-100.0,36.5],[-100.0,34.6],[-94.5,33.6],[-94.0,33.0],[-94.0,29.7]],
+ [[-96.6,49.0],[-96.6,45.9],[-104.05,45.9]],[[-96.5,42.5],[-104.05,43.0]],[[-95.3,40.0],[-102.05,40.0]],
+ [[-91.2,43.5],[-96.5,43.5]],[[-95.8,40.6],[-91.4,40.4]],[[-94.6,37.0],[-94.6,39.1],[-95.8,40.6]],
+ [[-91.0,33.0],[-94.0,33.0]],[[-89.5,36.5],[-90.3,35.0],[-91.2,33.0],[-91.6,31.0],[-89.6,31.0],[-89.6,30.2]],
+ [[-90.3,35.0],[-88.2,35.0],[-85.6,35.0],[-83.1,35.0],[-80.9,35.1],[-79.7,34.8],[-78.5,33.9]],
+ [[-88.4,35.0],[-88.4,30.4]],[[-85.0,32.0],[-87.6,31.0],[-87.5,30.3]],[[-85.6,35.0],[-85.0,32.0],[-85.0,31.0],[-82.0,30.6],[-81.4,30.7]],
+ [[-83.1,35.0],[-82.0,33.0],[-80.9,32.1]],
+ [[-91.2,43.5],[-91.4,40.4],[-89.4,37.0],[-88.0,37.8],[-87.6,38.2],[-86.0,38.0],[-84.8,39.1],[-82.6,38.4],[-82.0,37.5],[-81.7,36.6]],
+ [[-87.6,41.7],[-87.5,39.0],[-87.6,38.2]],[[-84.8,41.7],[-84.8,39.1]],[[-80.5,42.0],[-80.5,39.7],[-75.8,39.7],[-75.6,39.85]],
+ [[-87.6,42.5],[-90.6,42.5],[-91.2,43.5],[-92.0,44.5],[-92.8,45.6],[-92.3,46.7]],[[-80.5,40.6],[-80.6,39.7],[-79.5,39.2],[-77.7,39.3],[-77.0,38.8],[-76.3,37.9]],
+ [[-79.8,42.0],[-75.4,42.0],[-75.0,41.4],[-73.9,41.0]],[[-73.5,45.0],[-73.3,42.7],[-73.5,41.1]],[[-73.3,42.7],[-71.3,42.7],[-70.7,42.9]],
+ [[-71.5,45.0],[-71.1,43.0],[-70.7,42.9]],[[-71.8,42.0],[-71.8,41.3]],[[-71.4,42.0],[-73.5,42.05]],[[-72.5,42.7],[-72.3,45.0]]
+];
+</script>
+<script>
+"use strict";
+/* ================= STATE ================= */
+const LS_KEY="neuroResidencyExplorer_v1";
+const FACTORS=[
+ ["prestige","Prestige",p=>p.prestige],
+ ["happiness","Resident Happiness",p=>p.residentHappiness],
+ ["mentorship","Mentorship",p=>p.mentorship],
+ ["fellowships","Fellowships",p=>p.fellowships],
+ ["research","Research",p=>p.research],
+ ["clinical","Clinical Training",p=>p.clinical],
+ ["stroke","Stroke Exposure",p=>p.stroke],
+ ["neuroICU","Neuro ICU",p=>p.neuroICU],
+ ["col","Cost of Living",p=>p.colScore],
+ ["salary","Salary (purchasing power)",p=>p.salaryScore],
+ ["weather","Weather",p=>p.weather],
+ ["airport","Airport Access",p=>p.airport],
+ ["safety","Safety",p=>p.safety],
+ ["restaurants","Restaurants",p=>p.dining],
+ ["family","Family Proximity",p=>p.familyScore],
+ ["lifestyle","Lifestyle",p=>p.lifestyle],
+ ["workLife","Work-Life Balance",p=>p.workLife]
+];
+const DEFAULT_W={prestige:7,happiness:8,mentorship:7,fellowships:7,research:5,clinical:8,stroke:5,neuroICU:4,col:5,salary:4,weather:5,airport:4,safety:5,restaurants:4,family:5,lifestyle:6,workLife:6};
+const PRESETS={
+ "Balanced":DEFAULT_W,
+ "Academic star":{prestige:10,happiness:5,mentorship:8,fellowships:10,research:10,clinical:7,stroke:6,neuroICU:5,col:1,salary:1,weather:1,airport:3,safety:2,restaurants:2,family:2,lifestyle:2,workLife:2},
+ "Clinical workhorse":{prestige:4,happiness:6,mentorship:7,fellowships:6,research:2,clinical:10,stroke:10,neuroICU:9,col:3,salary:3,weather:2,airport:2,safety:3,restaurants:2,family:3,lifestyle:3,workLife:4},
+ "Happy & balanced":{prestige:3,happiness:10,mentorship:8,fellowships:5,research:2,clinical:6,stroke:3,neuroICU:3,col:6,salary:5,weather:7,airport:5,safety:7,restaurants:6,family:7,lifestyle:9,workLife:10},
+ "Money-wise":{prestige:3,happiness:6,mentorship:5,fellowships:5,research:2,clinical:6,stroke:3,neuroICU:3,col:10,salary:10,weather:4,airport:3,safety:5,restaurants:3,family:5,lifestyle:4,workLife:6}
+};
+const GUT_Q=[["excited","How excited would I be matching here?"],["live","Could I see myself living here?"],["people","Are these \"my people\"?"],["noPrestige","Would I choose it without prestige?"]];
+const TIERS=[["dream","Dream Programs"],["strong","Strong Fit"],["good","Good Fit"],["backup","Backup"]];
+const NOTE_FIELDS=[["green","Green Flags"],["red","Red Flags"],["faculty","Faculty Quotes"],["resident","Resident Quotes"],["questions","Questions"],["thoughts","Personal Thoughts"]];
+
+function defaults(){return{weights:{...DEFAULT_W},family:0,overrides:{},gut:{},notes:{},rankList:null,tiers:{},reactions:{},theme:null,compareSel:["vanderbilt","mayojax","emory"],battle:["vanderbilt","mayojax"],dashSort:"overall",profile:"hopkins",notesSel:"hopkins",gutSel:"hopkins",tab:"dashboard"}}
+let S=defaults();
+try{const raw=localStorage.getItem(LS_KEY);if(raw){const o=JSON.parse(raw);S=Object.assign(defaults(),o);S.weights=Object.assign({...DEFAULT_W},o.weights||{});}}catch(e){}
+let saveT;function save(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(LS_KEY,JSON.stringify(S))}catch(e){}},150)}
+
+/* ================= HELPERS ================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money=n=>(n<0?"−$":"$")+Math.abs(Math.round(n)).toLocaleString("en-US");
+const kmoney=n=>(n<0?"−$":"$")+(Math.abs(n)/1000).toFixed(1)+"k";
+const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const r1=n=>Math.round(n*10)/10;
+function fedTax(g){const t=Math.max(0,g-15000);const br=[[11925,.10],[48475,.12],[103350,.22],[197300,.24],[1e12,.32]];let tax=0,prev=0;for(const[c,r]of br){if(t>prev){tax+=(Math.min(t,c)-prev)*r;prev=c}else break}return tax}
+function miles(a,b,c,d){const R=3959,t=Math.PI/180;const x=Math.sin((c-a)*t/2)**2+Math.cos(a*t)*Math.cos(c*t)*Math.sin((d-b)*t/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
+function hash(s){let h=7;for(const ch of s)h=(h*31+ch.charCodeAt(0))>>>0;return h}
+
+/* ================= MODEL ================= */
+let P=[],PM={},ORDER=[];
+function recompute(){
+  P=BASE.map(b=>{const o=Object.assign({},b,S.overrides[b.id]||{});
+    o.fed=fedTax(o.salary);o.fica=o.salary*0.0765;o.stateTaxAmt=o.salary*o.stateTax/100;
+    o.net=o.salary-o.fed-o.fica-o.stateTaxAmt;
+    o.otherCost=21000*o.col/100;o.annualRent=o.rent*12;
+    o.savings=o.net-o.annualRent-o.otherCost;
+    o.purchasing=o.net/(o.col/100);
+    o.rentPct=o.annualRent/o.net*100;
+    o.training=avg([o.clinical,o.stroke,o.neuroICU,o.epilepsy,o.movementDisorders,o.ms,o.neuromuscular,o.cognitive]);
+    o.lifestyle=avg([o.weather,o.dining,o.shopping,o.walkability,o.safety,o.outdoor,o.entertainment]);
+    o.residentLife=avg([o.residentHappiness,o.camaraderie,o.facultySupport,o.wellness,11-o.burnoutRisk,o.workLife]);
+    const fc=FAMILY_CITIES[S.family]||FAMILY_CITIES[0];
+    if(fc[1]!=null){o.familyMiles=miles(o.lat,o.lon,fc[1],fc[2]);o.familyScore=clamp(10-(o.familyMiles-100)/180,1,10)}else{o.familyMiles=null;o.familyScore=o.familyManual}
+    return o});
+  const scale=(key,inv)=>{const v=P.map(p=>p[key]),mn=Math.min(...v),mx=Math.max(...v);P.forEach(p=>{let s=mx===mn?5.5:1+9*(p[key]-mn)/(mx-mn);if(inv)s=11-s;p[key+"Score"]=s})};
+  scale("col",true);scale("purchasing");scale("savings");
+  P.forEach(p=>{p.salaryScore=p.purchasingScore});
+  const W=S.weights;let wsum=0;FACTORS.forEach(f=>wsum+=W[f[0]]||0);
+  P.forEach(p=>{let s=0;FACTORS.forEach(f=>s+=(W[f[0]]||0)*f[2](p));p.overall=wsum?s/wsum*10:0;
+    const g=S.gut[p.id];
+    if(g&&GUT_Q.every(q=>g[q[0]]!=null)){p.matchHappy=avg(GUT_Q.map(q=>g[q[0]]))*10;p.matchHappyRated=true}
+    else{p.matchHappy=(p.overall/10*0.5+p.residentLife*0.3+p.lifestyle*0.2)*10;p.matchHappyRated=false}});
+  ORDER=P.slice().sort((a,b)=>b.overall-a.overall).map(p=>p.id);
+  P.forEach(p=>p.rank=ORDER.indexOf(p.id)+1);
+  PM={};P.forEach(p=>PM[p.id]=p);
+}
+const byRank=()=>ORDER.map(id=>PM[id]);
+function myList(){let l=Array.isArray(S.rankList)?S.rankList.filter(id=>PM[id]):[];ORDER.map(id=>({id})).forEach(b=>{if(!l.includes(b.id))l.push(b.id)});return l}
+
+/* ================= TOOLTIP ================= */
+const tip=$("#tip");let tipT;
+function showTip(html,x,y){tip.innerHTML=html;tip.classList.add("on");const w=tip.offsetWidth,h=tip.offsetHeight;let L=x+14,T=y+14;if(L+w>innerWidth-8)L=x-w-14;if(T+h>innerHeight-8)T=y-h-14;tip.style.left=Math.max(8,L)+"px";tip.style.top=Math.max(8,T)+"px"}
+function hideTip(){tip.classList.remove("on")}
+document.addEventListener("pointermove",e=>{if(e.pointerType!=="mouse")return;const t=e.target.closest&&e.target.closest("[data-tip]");if(t)showTip(t.getAttribute("data-tip"),e.clientX,e.clientY);else hideTip()});
+document.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse")return;const t=e.target.closest&&e.target.closest("[data-tip]");if(t){showTip(t.getAttribute("data-tip"),e.clientX,e.clientY);clearTimeout(tipT);tipT=setTimeout(hideTip,2600)}else hideTip()});
+document.addEventListener("scroll",hideTip,{passive:true});
+
+/* ================= CHARTS ================= */
+// Keyed animated horizontal bar chart (HTML)
+function hbar(el,items,o={}){
+  o=Object.assign({max:null,fmt:v=>Math.round(v),rowH:26,onClick:null,tip:null},o);
+  el.classList.add("hbar");const max=o.max||Math.max(...items.map(i=>i.value))||1;
+  el.style.height=items.length*o.rowH+"px";
+  const existing={};$$(".r",el).forEach(r=>existing[r.dataset.id]=r);
+  items.forEach((it,i)=>{let r=existing[it.id];
+    if(!r){r=document.createElement("div");r.className="r";r.dataset.id=it.id;r.innerHTML='<div class="l"></div><div class="t"><div class="f" style="width:0"></div></div><div class="v num"></div>';r.style.top=i*o.rowH+"px";el.appendChild(r);
+      if(o.onClick)r.addEventListener("click",()=>o.onClick(r.dataset.id))}
+    delete existing[it.id];
+    r.style.height=o.rowH+"px";
+    r.classList.toggle("hl",!!it.hl);
+    r.querySelector(".l").textContent=it.label;
+    r.querySelector(".v").textContent=o.fmt(it.value);
+    r.setAttribute("data-tip",o.tip?o.tip(it):"<b>"+esc(it.label)+"</b>"+esc(o.fmt(it.value)));
+    requestAnimationFrame(()=>{r.style.top=i*o.rowH+"px";r.querySelector(".f").style.width=clamp(it.value/max*100,0,100)+"%"});
+  });
+  Object.values(existing).forEach(r=>r.remove());
+}
+const SHORT={hopkins:"Hopkins",penn:"Penn",columbia:"Columbia",cornell:"Cornell",nyu:"NYU",sinai:"Mount Sinai",vanderbilt:"Vanderbilt",emory:"Emory",mayojax:"Mayo Jax",brown:"Brown",dartmouth:"Dartmouth",uva:"UVA",wake:"Wake Forest",usf:"USF",uf:"UF",miami:"Miami",bu:"BU",uthsa:"UT San Antonio"};
+const lab=p=>innerWidth<640?SHORT[p.id]:p.name;
+const progItems=(fn,opts={})=>{let arr=P.map(p=>({id:p.id,label:lab(p),value:fn(p),hl:opts.hl&&opts.hl(p)}));arr.sort((a,b)=>opts.asc?a.value-b.value:b.value-a.value);return arr};
+function chartCard(id,title,sub){return `<div class="card"><h3>${esc(title)}</h3>${sub?`<p class="sub">${sub}</p>`:'<p class="sub"></p>'}<div id="${id}"></div></div>`}
+const top3=()=>{const s=new Set(ORDER.slice(0,3));return p=>s.has(p.id)};
+
+const SERIES=["var(--s1)","var(--s2)","var(--s3)","var(--s4)"];
+function radar(axes,series,size=300){
+  const c=size/2,R=size/2-46,n=axes.length;const pt=(i,v)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[c+Math.cos(a)*R*v/10,c+Math.sin(a)*R*v/10]};
+  let g="";[2,4,6,8,10].forEach(l=>{g+=`<polygon class="gridl" fill="none" points="${axes.map((_,i)=>pt(i,l).join(",")).join(" ")}"/>`});
+  axes.forEach((a,i)=>{const[x,y]=pt(i,10);g+=`<line class="gridl" x1="${c}" y1="${c}" x2="${x}" y2="${y}"/>`;const[lx,ly]=pt(i,12.2);const anc=Math.abs(lx-c)<8?"middle":lx>c?"start":"end";g+=`<text x="${lx}" y="${ly+4}" text-anchor="${anc}">${esc(a)}</text>`});
+  series.forEach((s,si)=>{const pts=s.values.map((v,i)=>pt(i,v));g+=`<polygon points="${pts.map(p=>p.join(",")).join(" ")}" style="fill:${s.color};fill-opacity:.12;stroke:${s.color};stroke-width:2"/>`;
+    pts.forEach((p,i)=>{g+=`<circle cx="${p[0]}" cy="${p[1]}" r="4" style="fill:${s.color};stroke:var(--card);stroke-width:2"/><circle cx="${p[0]}" cy="${p[1]}" r="12" fill="transparent" data-tip="<b>${esc(s.name)}</b>${esc(axes[i])}: ${r1(s.values[i])}"/>`})});
+  return `<svg class="chart" viewBox="-30 -6 ${size+60} ${size+12}" role="img">${g}</svg>`;
+}
+function legend(series){return `<div class="legend">${series.map(s=>`<span><i style="background:${s.color}"></i>${esc(s.name)}</span>`).join("")}</div>`}
+function scatter(items,o){
+  const W=560,H=360,m={l:62,r:20,t:16,b:44};const xs=items.map(i=>i.x),ys=items.map(i=>i.y);
+  const nice=(mn,mx)=>{const pad=(mx-mn)*0.1||1;return[mn-pad,mx+pad]};const[x0,x1]=nice(Math.min(...xs),Math.max(...xs)),[y0,y1]=nice(Math.min(...ys),Math.max(...ys));
+  const X=v=>m.l+(v-x0)/(x1-x0)*(W-m.l-m.r),Y=v=>H-m.b-(v-y0)/(y1-y0)*(H-m.t-m.b);
+  let g="";for(let i=0;i<=4;i++){const yv=y0+(y1-y0)*i/4,xv=x0+(x1-x0)*i/4;g+=`<line class="gridl" x1="${m.l}" x2="${W-m.r}" y1="${Y(yv)}" y2="${Y(yv)}"/><text x="${m.l-8}" y="${Y(yv)+4}" text-anchor="end">${o.fy(yv)}</text><text x="${X(xv)}" y="${H-m.b+18}" text-anchor="middle">${o.fx(xv)}</text>`}
+  g+=`<text x="${(W+m.l)/2}" y="${H-6}" text-anchor="middle" style="font-weight:600">${esc(o.xl)}</text><text transform="translate(14 ${(H-m.b)/2}) rotate(-90)" text-anchor="middle" style="font-weight:600">${esc(o.yl)}</text>`;
+  items.slice().sort((a,b)=>b.r-a.r).forEach(it=>{g+=`<g data-tip="${it.tip}" style="cursor:pointer" onclick="go('profiles','${it.id}')"><circle cx="${X(it.x)}" cy="${Y(it.y)}" r="${it.r}" style="fill:${it.hl?'var(--s2)':'var(--s1)'};fill-opacity:.55;stroke:var(--card);stroke-width:2"/><text x="${X(it.x)}" y="${Y(it.y)-it.r-3}" text-anchor="middle" style="font-size:10px;fill:var(--text)">${esc(it.label)}</text></g>`});
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}">${g}</svg>`;
+}
+function lineChart(series,xl,o){
+  const W=560,H=300,m={l:62,r:20,t:14,b:34};const all=series.flatMap(s=>s.values);let y0=Math.min(0,...all),y1=Math.max(...all)*1.08;
+  const X=i=>m.l+i/(xl.length-1)*(W-m.l-m.r),Y=v=>H-m.b-(v-y0)/(y1-y0)*(H-m.t-m.b);
+  let g="";for(let i=0;i<=4;i++){const v=y0+(y1-y0)*i/4;g+=`<line class="gridl" x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${m.l-8}" y="${Y(v)+4}" text-anchor="end">${o.fy(v)}</text>`}
+  if(y0<0)g+=`<line class="axisl" x1="${m.l}" x2="${W-m.r}" y1="${Y(0)}" y2="${Y(0)}" style="stroke-width:1.5"/>`;
+  xl.forEach((l,i)=>g+=`<text x="${X(i)}" y="${H-m.b+20}" text-anchor="middle">${esc(l)}</text>`);
+  series.forEach(s=>{g+=`<polyline fill="none" points="${s.values.map((v,i)=>X(i)+","+Y(v)).join(" ")}" style="stroke:${s.color};stroke-width:2;stroke-linejoin:round"/>`;
+    s.values.forEach((v,i)=>g+=`<circle cx="${X(i)}" cy="${Y(v)}" r="4" style="fill:${s.color};stroke:var(--card);stroke-width:2"/><circle cx="${X(i)}" cy="${Y(v)}" r="13" fill="transparent" data-tip="<b>${esc(s.name)}</b>${esc(xl[i])}: ${o.fy(v)}"/>`)});
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}">${g}</svg>`;
+}
+function meter(label,v,inv){return `<div class="meter ${inv?'inv':''}"><div class="h"><span>${esc(label)}</span><b>${r1(v)}</b></div><div class="tr"><i style="width:${v*10}%"></i></div></div>`}
+function progSelect(id,val,onch){return `<select class="sel" id="${id}" onchange="${onch}">${BASE.map(b=>`<option value="${b.id}" ${b.id===val?'selected':''}>${esc(b.name)}</option>`).join("")}</select>`}
+
+/* ================= NAV ================= */
+const TABS=[["dashboard","Dashboard"],["compare","Compare"],["rankings","Rankings"],["maps","Map"],["lifestyle","Lifestyle"],["neuro","Neurology Training"],["finance","Finance"],["profiles","Profiles"],["matchday","Match Day"],["notes","Notes"]];
+$("#tabs").innerHTML=TABS.map(t=>`<button data-t="${t[0]}">${t[1]}</button>`).join("");
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(b)go(b.dataset.t)});
+const RENDER={};
+function go(tab,arg){
+  if(tab==="profiles"&&arg)S.profile=arg;
+  if(tab==="notes"&&arg)S.notesSel=arg;
+  S.tab=tab;save();
+  $$("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===tab));
+  const ab=$(`#tabs button[data-t="${tab}"]`);if(ab&&ab.scrollIntoView)ab.scrollIntoView({block:"nearest",inline:"center",behavior:"smooth"});
+  $$("section.view").forEach(s=>s.classList.toggle("on",s.id==="v-"+tab));
+  RENDER[tab]();
+  if(arg)window.scrollTo({top:0,behavior:"smooth"});
+}
+window.go=go;
+
+/* ================= THEME ================= */
+function applyTheme(){if(S.theme)document.documentElement.setAttribute("data-theme",S.theme);else document.documentElement.removeAttribute("data-theme")}
+$("#themeBtn").onclick=()=>{const dark=S.theme?S.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;S.theme=dark?"light":"dark";applyTheme();save()};
+applyTheme();
+
+/* ================= DASHBOARD ================= */
+const SORTS={overall:["Overall",p=>p.overall],prestige:["Prestige",p=>p.prestige*10],training:["Training",p=>p.training*10],lifestyle:["Lifestyle",p=>p.lifestyle*10],col:["Cost of Living",p=>p.colScore*10],happiness:["Resident Happiness",p=>p.residentHappiness*10],fellowships:["Fellowship Placement",p=>p.fellowships*10],research:["Research",p=>p.research*10]};
+function best(fn){return P.slice().sort((a,b)=>fn(b)-fn(a)||b.overall-a.overall)[0]}
+RENDER.dashboard=function(){
+  const v=$("#v-dashboard");const top=byRank().slice(0,6);
+  const tiles=[["Best Overall",p=>p.overall,p=>`Score ${Math.round(p.overall)}`],["Best Lifestyle",p=>p.lifestyle,p=>`Lifestyle ${r1(p.lifestyle)}/10`],["Best Fellowships",p=>p.fellowships,p=>`Fellowships ${p.fellowships}/10`],["Best Cost Savings",p=>p.savings,p=>`~${kmoney(p.savings)}/yr left over`],["Best Weather",p=>p.weather,p=>`Weather ${p.weather}/10`],["Best Research",p=>p.research,p=>`Research ${p.research}/10`],["Best Resident Happiness",p=>p.residentHappiness,p=>`Happiness ${p.residentHappiness}/10`]];
+  v.innerHTML=`
+  <div class="vhead"><div><h2>Dashboard</h2><p>Live rankings based on your priorities. Tune the weights on <a href="#" onclick="go('rankings');return false">Rankings</a> and everything here updates. A ~ means match happiness is estimated until you rate it on Match Day.</p></div><span class="estimate">Scores use editable estimates</span></div>
+  <h3 style="margin-bottom:10px">Top programs right now</h3>
+  <div class="topcards">${top.map((p,i)=>`<div class="card pcard" onclick="go('profiles','${p.id}')"><div class="rankbadge">#${i+1}</div><div style="font-weight:700">${esc(p.name)}</div><div class="loc">${esc(p.city)}, ${p.st}</div><div class="bigscore num">${Math.round(p.overall)}</div><div class="small muted">Overall score</div><div class="minis"><div class="mini"><b class="num">${p.matchHappyRated?'':'~'}${Math.round(p.matchHappy)}</b><span>Match happiness</span></div><div class="mini"><b class="num">${Math.round(p.lifestyle*10)}</b><span>Lifestyle</span></div><div class="mini"><b class="num">${Math.round(p.training*10)}</b><span>Training</span></div></div></div>`).join("")}</div>
+  <div class="card mt"><div class="row" style="margin-bottom:6px"><h3>Interactive rankings</h3><span class="spacer"></span></div><p class="sub">Programs ranked by the selected measure (0–100). Your current top 3 are highlighted. Tap a bar to open the profile.</p>
+    <div class="row" style="margin-bottom:12px" id="dashSorts">${Object.entries(SORTS).map(([k,s])=>`<button class="pill ${S.dashSort===k?'on':''}" data-k="${k}">${s[0]}</button>`).join("")}</div>
+    <div id="dashChart"></div></div>
+  <h3 class="mt" style="margin:18px 0 10px">Category leaders</h3>
+  <div class="tiles">${tiles.map(t=>{const p=best(t[1]);return `<div class="card tile" onclick="go('profiles','${p.id}')"><div class="lab">${t[0]}</div><div class="val">${esc(p.name)}</div><div class="meta">${t[2](p)}</div></div>`}).join("")}</div>`;
+  $("#dashSorts").onclick=e=>{const b=e.target.closest("button");if(!b)return;S.dashSort=b.dataset.k;save();$$("#dashSorts .pill").forEach(x=>x.classList.toggle("on",x===b));drawDash()};
+  drawDash();
+};
+function drawDash(){const f=SORTS[S.dashSort][1];hbar($("#dashChart"),progItems(f,{hl:top3()}).sort((a,b)=>b.value-a.value||PM[b.id].overall-PM[a.id].overall),{max:100,onClick:id=>go("profiles",id),tip:it=>`<b>${esc(it.label)}</b>${SORTS[S.dashSort][0]}: ${Math.round(it.value)} · Overall rank #${PM[it.id].rank}`})}
+
+/* ================= RANKINGS (priority engine) ================= */
+RENDER.rankings=function(){
+  const v=$("#v-rankings");
+  v.innerHTML=`<div class="vhead"><div><h2>Priority engine</h2><p>Slide each factor from 0 (don't care) to 10 (critical). Every ranking, chart and leader tile recalculates instantly. Score = weighted average of 1–10 ratings, scaled to 0–100.</p></div></div>
+  <div class="card"><div class="row" style="margin-bottom:10px"><b class="small">Presets:</b>${Object.keys(PRESETS).map(k=>`<button class="pill" data-p="${esc(k)}">${esc(k)}</button>`).join("")}</div>
+   <div class="sliders">${FACTORS.map(f=>`<div class="sl"><div class="h"><label for="w_${f[0]}">${f[1]}</label><span id="wv_${f[0]}">${S.weights[f[0]]}</span></div><input type="range" min="0" max="10" step="1" id="w_${f[0]}" data-k="${f[0]}" value="${S.weights[f[0]]}"></div>`).join("")}</div>
+   <div class="row mt"><label class="small" for="famSel"><b>Family lives near:</b></label><select class="sel" id="famSel">${FAMILY_CITIES.map((c,i)=>`<option value="${i}" ${S.family==i?'selected':''}>${esc(c[0])}</option>`).join("")}</select><span class="small muted">Turns "Family Proximity" into a real distance score.</span></div></div>
+  <div class="grid g2 mt"><div class="card"><h3>Live ranking</h3><p class="sub">Overall weighted score, 0–100. Top 3 highlighted.</p><div id="rkChart"></div></div>
+   <div class="card"><div class="row"><h3>My rank list</h3><span class="spacer"></span><button class="btn" id="adoptBtn">Use computed order</button></div><p class="sub">Your personal order, saved on this device. The tag shows where the formula puts each program.</p><ul class="rl" id="rankList"></ul></div></div>`;
+  $$("#v-rankings input[type=range]").forEach(inp=>inp.addEventListener("input",()=>{S.weights[inp.dataset.k]=+inp.value;$("#wv_"+inp.dataset.k).textContent=inp.value;save();recompute();updRank()}));
+  $$("#v-rankings [data-p]").forEach(b=>b.onclick=()=>{S.weights={...PRESETS[b.dataset.p]};FACTORS.forEach(f=>{$("#w_"+f[0]).value=S.weights[f[0]];$("#wv_"+f[0]).textContent=S.weights[f[0]]});save();recompute();updRank()});
+  $("#famSel").onchange=e=>{S.family=+e.target.value;save();recompute();updRank()};
+  $("#adoptBtn").onclick=()=>{S.rankList=ORDER.slice();save();updRank()};
+  updRank();
+};
+function updRank(){
+  hbar($("#rkChart"),progItems(p=>p.overall,{hl:top3()}),{max:100,onClick:id=>go("profiles",id),tip:it=>`<b>${esc(it.label)}</b>Score ${Math.round(it.value)}`});
+  const l=myList();
+  $("#rankList").innerHTML=l.map((id,i)=>{const p=PM[id];return `<li><span class="n">${i+1}</span><span class="nm">${esc(p.name)}<small>${esc(p.city)}, ${p.st} · score ${Math.round(p.overall)}</small></span><span class="delta" title="Formula rank">calc #${p.rank}</span><button aria-label="Move up" onclick="mv(${i},-1)">▲</button><button aria-label="Move down" onclick="mv(${i},1)">▼</button></li>`}).join("");
+}
+window.mv=(i,d)=>{const l=myList();const j=i+d;if(j<0||j>=l.length)return;[l[i],l[j]]=[l[j],l[i]];S.rankList=l;save();updRank()};
+
+/* ================= COMPARE + BATTLE ================= */
+RENDER.compare=function(){
+  const v=$("#v-compare");const sel=S.compareSel.filter(id=>PM[id]).slice(0,4);S.compareSel=sel;
+  const ps=sel.map(id=>PM[id]);const ser=(fn)=>ps.map((p,i)=>({name:p.name,color:SERIES[i],values:fn(p)}));
+  const rows=[["Overall",[["Rank",p=>p.rank,true,v=>"#"+v],["Overall score",p=>p.overall,false,v=>Math.round(v)],["Prestige",p=>p.prestige],["Resident happiness",p=>p.residentHappiness],["Match Day prediction",p=>p.matchHappy,false,(v,p)=>Math.round(v)+(p.matchHappyRated?"":"*")]]],
+    ["Neurology",[["Stroke",p=>p.stroke],["Neuro ICU",p=>p.neuroICU],["Epilepsy",p=>p.epilepsy],["Movement disorders",p=>p.movementDisorders],["MS",p=>p.ms],["Neuromuscular",p=>p.neuromuscular],["Cognitive",p=>p.cognitive],["Research",p=>p.research]]],
+    ["Lifestyle",[["Weather",p=>p.weather],["Safety",p=>p.safety],["Dining",p=>p.dining],["Shopping",p=>p.shopping],["Entertainment",p=>p.entertainment],["Outdoor recreation",p=>p.outdoor]]],
+    ["Financial",[["Salary",p=>p.salary,false,kmoney],["Rent / mo",p=>p.rent,true,money],["Cost of living idx",p=>p.col,true],["Savings potential / yr",p=>p.savings,false,kmoney]]]];
+  let tbl=`<table class="tbl"><thead><tr><th></th>${ps.map((p,i)=>`<th style="color:${SERIES[i]}">${esc(p.abbr)}</th>`).join("")}</tr></thead><tbody>`;
+  rows.forEach(([sec,rs])=>{tbl+=`<tr class="sec"><td colspan="${ps.length+1}">${sec}</td></tr>`;rs.forEach(([lab,fn,low,fmt])=>{const vals=ps.map(fn);const b=low?Math.min(...vals):Math.max(...vals);tbl+=`<tr><td>${lab}</td>${ps.map((p,i)=>`<td class="${ps.length>1&&vals[i]===b?'best':''}">${fmt?fmt(vals[i],p):vals[i]}</td>`).join("")}</tr>`})});
+  tbl+="</tbody></table>";
+  const neuroAx=["Stroke","Neuro ICU","Epilepsy","Movement","MS","Neuromusc.","Cognitive","Research"];
+  const lifeAx=["Weather","Safety","Dining","Shopping","Entertain.","Outdoors"];
+  const ovAx=["Prestige","Happiness","Training","Research","Fellowships","Lifestyle","Value"];
+  v.innerHTML=`<div class="vhead"><div><h2>Compare programs</h2><p>Pick up to 4. Best value in each row is highlighted. * = estimated match happiness (rate it on Match Day).</p></div></div>
+  <div class="card"><div class="row" id="cmpPick">${byRank().map(p=>`<button class="pill ${sel.includes(p.id)?'on':''}" data-id="${p.id}" ${!sel.includes(p.id)&&sel.length>=4?'disabled':''}>${esc(p.name)}</button>`).join("")}</div></div>
+  ${ps.length?`<div class="grid g3 mt"><div class="card"><h3>Overall profile</h3>${radar(ovAx,ser(p=>[p.prestige,p.residentHappiness,p.training,p.research,p.fellowships,p.lifestyle,(p.colScore+p.salaryScore)/2]))}${legend(ser(()=>[]))}</div>
+   <div class="card"><h3>Neurology training</h3>${radar(neuroAx,ser(p=>[p.stroke,p.neuroICU,p.epilepsy,p.movementDisorders,p.ms,p.neuromuscular,p.cognitive,p.research]))}${legend(ser(()=>[]))}</div>
+   <div class="card"><h3>Lifestyle</h3>${radar(lifeAx,ser(p=>[p.weather,p.safety,p.dining,p.shopping,p.entertainment,p.outdoor]))}${legend(ser(()=>[]))}</div></div>
+  <div class="card mt"><h3>Side by side</h3><p class="sub">Ratings are 1–10 estimates.</p><div class="tblwrap">${tbl}</div></div>`:`<div class="card mt muted">Select at least one program above.</div>`}
+  <div class="card mt" id="battle"></div>`;
+  $("#cmpPick").onclick=e=>{const b=e.target.closest("button");if(!b||b.disabled)return;const id=b.dataset.id;S.compareSel=sel.includes(id)?sel.filter(x=>x!==id):[...sel,id];save();RENDER.compare()};
+  drawBattle();
+};
+function drawBattle(){
+  const[a,b]=S.battle.map(id=>PM[id]);
+  const cats=[["Overall score",p=>p.overall],["Prestige",p=>p.prestige],["Training",p=>p.training],["Research",p=>p.research],["Fellowships",p=>p.fellowships],["Resident happiness",p=>p.residentHappiness],["Mentorship",p=>p.mentorship],["Work-life balance",p=>p.workLife],["Stroke",p=>p.stroke],["Neuro ICU",p=>p.neuroICU],["Epilepsy",p=>p.epilepsy],["Movement",p=>p.movementDisorders],["Lifestyle",p=>p.lifestyle],["Weather",p=>p.weather],["Safety",p=>p.safety],["Food scene",p=>p.dining],["Airport",p=>p.airport],["Purchasing power",p=>p.purchasing,kmoney],["Savings / yr",p=>p.savings,kmoney],["Family proximity",p=>p.familyScore],["Match happiness",p=>p.matchHappy]];
+  let wa=0,wb=0;const rows=cats.map(([lab,fn,fmt])=>{const x=fn(a),y=fn(b);const f=fmt||(v=>r1(v));if(x>y+1e-9)wa++;else if(y>x+1e-9)wb++;return `<div class="brow"><div class="a ${x>y+1e-9?'w':''}">${f(x)}${x>y+1e-9?' ✓':''}</div><div class="c">${lab}</div><div class="b ${y>x+1e-9?'w':''}">${y>x+1e-9?'✓ ':''}${f(y)}</div></div>`}).join("");
+  const winner=wa===wb?"It's a tie!":(wa>wb?a.name:b.name)+" wins";
+  $("#battle").innerHTML=`<h3>Residency battle</h3><p class="sub">Two programs, head to head. Category winners get a check.</p>
+   <div class="row" style="margin-bottom:12px">${progSelect("batA",a.id,"S.battle[0]=this.value;save();drawBattle()")}<b class="muted">vs</b>${progSelect("batB",b.id,"S.battle[1]=this.value;save();drawBattle()")}</div>
+   <div class="vs"><div class="side"><div class="sc num">${wa}</div><div>${esc(a.name)}</div></div><div class="mid">VS</div><div class="side"><div class="sc num">${wb}</div><div>${esc(b.name)}</div></div></div>
+   <p style="text-align:center;font-weight:800;font-size:1.1rem;margin:8px 0 12px">🏆 ${esc(winner)} ${wa!==wb?`${Math.max(wa,wb)}–${Math.min(wa,wb)}`:''}</p>${rows}`;
+}
+window.drawBattle=drawBattle;window.S=S;window.save=save;
+
+/* ================= MAP ================= */
+const ALB=(()=>{const t=Math.PI/180,p1=29.5*t,p2=45.5*t,p0=37.5*t,l0=-96*t;const n=(Math.sin(p1)+Math.sin(p2))/2,C=Math.cos(p1)**2+2*n*Math.sin(p1),r0=Math.sqrt(C-2*n*Math.sin(p0))/n;
+  return(lon,lat)=>{const th=n*(lon*t-l0),r=Math.sqrt(C-2*n*Math.sin(lat*t))/n;return[r*Math.sin(th)*1000,-(r0-r*Math.cos(th))*1000]}})();
+let mapVB=null,MAPFULL=null;
+const LABEL_OFF={columbia:[8,-8,"start"],sinai:[-8,-8,"end"],cornell:[-8,8,"end"],nyu:[8,10,"start"],penn:[-8,4,"end"],hopkins:[-8,10,"end"],brown:[8,8,"start"],bu:[8,-4,"start"],uf:[-8,4,"end"],mayojax:[8,0,"start"],usf:[-8,4,"end"],miami:[-8,4,"end"]};
+RENDER.maps=function(){
+  const v=$("#v-maps");const path=pts=>"M"+pts.map(p=>ALB(p[0],p[1]).map(x=>x.toFixed(1)).join(",")).join("L");
+  if(!MAPFULL){const xs=[],ys=[];US_OUTLINE.forEach(p=>{const[x,y]=ALB(p[0],p[1]);xs.push(x);ys.push(y)});MAPFULL={x:Math.min(...xs)-10,y:Math.min(...ys)-10,w:Math.max(...xs)-Math.min(...xs)+20,h:Math.max(...ys)-Math.min(...ys)+20}}
+  if(!mapVB)mapVB={...MAPFULL};
+  const sel=S.mapSel||ORDER[0];
+  v.innerHTML=`<div class="vhead"><div><h2>Program map</h2><p>Pinch, scroll or use + / − to zoom; drag to pan. Tap a pin for details.</p></div><div class="row"><button class="pill" onclick="mapZoomTo('all')">All</button><button class="pill" onclick="mapZoomTo('ne')">Northeast</button><button class="pill" onclick="mapZoomTo('nyc')">NYC</button><button class="pill" onclick="mapZoomTo('se')">Southeast</button><button class="pill" onclick="mapZoomTo('fl')">Florida</button></div></div>
+  <div class="grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr)" id="mapGrid">
+   <div class="card" style="padding:8px"><div class="mapwrap"><svg id="usmap" viewBox="0 0 10 10" preserveAspectRatio="xMidYMid meet"><path class="land" d="${path(US_OUTLINE)}Z"/><path class="lake" d="${path(LAKE_MI)}Z"/>${BORDERS.map(b=>`<path d="${path(b)}" fill="none" style="stroke:var(--line);stroke-width:1" vector-effect="non-scaling-stroke"/>`).join("")}
+    <g id="pins">${P.map(p=>{const[x,y]=ALB(p.lon,p.lat);const o=LABEL_OFF[p.id]||[8,4,"start"];const nyc=["columbia","cornell","nyu","sinai"].includes(p.id);return `<g class="pin ${nyc?'nyc':''} ${p.id===sel?'on':''}" data-id="${p.id}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><circle class="hit" r="14" fill="transparent"/><circle class="dot" r="6"/><text x="${o[0]}" y="${o[1]}" text-anchor="${o[2]}">${esc(p.abbr)}</text></g>`}).join("")}${(()=>{const[x,y]=ALB(-73.95,40.78);const t=`translate(${x.toFixed(1)} ${y.toFixed(1)})`;return `<g id="nycLab" class="pin" data-t="${t}" transform="${t}" onclick="mapZoomTo('nyc')"><text x="10" y="-6">NYC ×4</text></g>`})()}</g></svg>
+    <div class="mapctl"><button onclick="mapZoom(0.6)" aria-label="Zoom in">+</button><button onclick="mapZoom(1/0.6)" aria-label="Zoom out">−</button><button onclick="mapZoomTo('all')" aria-label="Reset" style="font-size:.8rem">⟲</button></div></div></div>
+   <div class="card" id="mapInfo"></div></div>
+  <div class="card mt"><h3>All locations</h3><div class="row" style="margin-top:8px">${byRank().map(p=>`<button class="pill" onclick="mapPick('${p.id}',true)">${esc(p.abbr)} · ${esc(p.city)}</button>`).join("")}</div></div>`;
+  if(innerWidth<760)$("#mapGrid").style.gridTemplateColumns="minmax(0,1fr)";
+  setVB();mapInfo(sel);initMapInput();
+};
+function setVB(){const s=$("#usmap");if(!s)return;s.setAttribute("viewBox",`${mapVB.x} ${mapVB.y} ${mapVB.w} ${mapVB.h}`);const rc=s.getBoundingClientRect();const k=rc.width?Math.max(mapVB.w/rc.width,mapVB.h/rc.height):mapVB.w/700;const zoomedOut=mapVB.w>MAPFULL.w*0.3;s.style.setProperty('--nyclab',zoomedOut?'none':'inline');const ng=$('#nycLab');if(ng){ng.style.display=zoomedOut?'inline':'none';ng.setAttribute('transform',ng.dataset.t+` scale(${k})`)}$$("#pins .pin").forEach(g=>{const t=g.getAttribute("transform").replace(/ scale\(.*\)/,"");g.setAttribute("transform",t+` scale(${k})`)})}
+window.mapZoom=(f,cx,cy)=>{const ow=mapVB.w,oh=mapVB.h;let nw=clamp(ow*f,MAPFULL.w/14,MAPFULL.w*1.2);const r=nw/ow;cx=cx??mapVB.x+ow/2;cy=cy??mapVB.y+oh/2;mapVB={x:cx-(cx-mapVB.x)*r,y:cy-(cy-mapVB.y)*r,w:nw,h:oh*r};setVB()};
+window.mapZoomTo=k=>{const B={ne:[-81,37.5,-69.5,45.8],nyc:[-75.0,40.3,-73.2,41.2],se:[-90,24.5,-75,37.5],fl:[-88,24.5,-79.5,31.5]}[k];if(!B){mapVB={...MAPFULL};setVB();return}const[a,b]=ALB(B[0],B[1]),[c,d]=ALB(B[2],B[3]),[e,f]=ALB(B[0],B[3]),[g,h]=ALB(B[2],B[1]);const x0=Math.min(a,c,e,g),x1=Math.max(a,c,e,g),y0=Math.min(b,d,f,h),y1=Math.max(b,d,f,h);const asp=MAPFULL.h/MAPFULL.w;let w=x1-x0,hh=y1-y0;if(hh/w>asp)w=hh/asp;else hh=w*asp;mapVB={x:(x0+x1)/2-w/2,y:(y0+y1)/2-hh/2,w,h:hh};setVB()};
+window.mapPick=(id,center)=>{S.mapSel=id;save();$$("#pins .pin").forEach(g=>g.classList.toggle("on",g.dataset.id===id));mapInfo(id);if(center){const p=PM[id];const[x,y]=ALB(p.lon,p.lat);const w=MAPFULL.w/4,h=MAPFULL.h/4;mapVB={x:x-w/2,y:y-h/2,w,h};setVB();$("#usmap").scrollIntoView({block:"center",behavior:"smooth"})}};
+function mapInfo(id){const p=PM[id];$("#mapInfo").innerHTML=`<div class="small muted">#${p.rank} overall</div><h3 style="font-size:1.2rem;margin:2px 0">${esc(p.name)}</h3><div class="muted small">${esc(p.city)}, ${esc(p.state)}</div><p class="small">${esc(p.description)}</p><div>${p.bestFor.map(b=>`<span class="tag">${esc(b)}</span>`).join("")}</div>
+ <div class="meters" style="grid-template-columns:1fr 1fr;margin:10px 0">${meter("Training",p.training)}${meter("Lifestyle",p.lifestyle)}${meter("Weather",p.weather)}${meter("Airport",p.airport)}</div>
+ <div class="small">Rent ~${money(p.rent)}/mo · Salary ~${kmoney(p.salary)}${p.familyMiles!=null?` · ${Math.round(p.familyMiles)} mi from family`:''}</div><div class="row mt"><button class="btn primary" onclick="go('profiles','${p.id}')">Open profile</button><button class="btn" onclick="go('notes','${p.id}')">Notes</button></div>`}
+function initMapInput(){
+  const svg=$("#usmap");const pts=new Map();let start=null,moved=false,downPin=null;
+  const toSvg=(cx,cy)=>{const r=svg.getBoundingClientRect();const sc=Math.max(mapVB.w/r.width,mapVB.h/r.height);const ox=(r.width-mapVB.w/sc)/2,oy=(r.height-mapVB.h/sc)/2;return[mapVB.x+(cx-r.left-ox)*sc,mapVB.y+(cy-r.top-oy)*sc,sc]};
+  svg.addEventListener("wheel",e=>{e.preventDefault();const[x,y]=toSvg(e.clientX,e.clientY);mapZoom(e.deltaY>0?1.15:1/1.15,x,y)},{passive:false});
+  svg.addEventListener("pointerdown",e=>{const pn=e.target.closest&&e.target.closest(".pin");downPin=pts.size===0&&pn?pn:null;svg.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);moved=false;start={vb:{...mapVB},pts:new Map(pts)};svg.classList.add("drag")});
+  svg.addEventListener("pointermove",e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,[e.clientX,e.clientY]);const[,,sc]=toSvg(0,0);
+    if(pts.size===1&&start.pts.size===1){const[sx,sy]=start.pts.get(e.pointerId)||[e.clientX,e.clientY];const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>4)moved=true;mapVB={...start.vb,x:start.vb.x-dx*sc,y:start.vb.y-dy*sc};setVB()}
+    else if(pts.size===2){moved=true;const a=[...pts.values()];const d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);if(!start.d||start.pts.size!==2){start={vb:{...mapVB},pts:new Map(pts),d};return}const[x,y]=toSvg((a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2);mapZoom(start.d/d*start.vb.w/mapVB.w,x,y)}});
+  const up=e=>{const t=downPin;pts.delete(e.pointerId);svg.classList.remove("drag");if(!moved&&t){if(t.id==="nycLab")mapZoomTo("nyc");else mapPick(t.dataset.id)}downPin=null;if(pts.size===0)start=null;else start={vb:{...mapVB},pts:new Map(pts)}};
+  svg.addEventListener("pointerup",up);svg.addEventListener("pointercancel",e=>{pts.delete(e.pointerId);start=null});
+}
+
+/* ================= LIFESTYLE ================= */
+RENDER.lifestyle=function(){
+  const v=$("#v-lifestyle");
+  v.innerHTML=`<div class="vhead"><div><h2>Lifestyle explorer</h2><p>Where would daily life feel best? Tap any bar or bubble to open the program.</p></div><span class="estimate">Rents, salaries and ratings are estimates</span></div>
+  <div class="card"><h3>Salary vs rent</h3><p class="sub">X = monthly 1-BR rent, Y = PGY-1 salary, bubble size = prestige. Up and to the left is the sweet spot.</p>${scatter(P.map(p=>({id:p.id,x:p.rent,y:p.salary,r:4+p.prestige*1.6,label:p.abbr,hl:false,tip:`<b>${esc(p.name)}</b>Rent ${money(p.rent)}/mo · Salary ${money(p.salary)} · Prestige ${p.prestige}`})),{xl:"Monthly rent",yl:"PGY-1 salary",fx:v=>"$"+(v/1000).toFixed(1)+"k",fy:v=>"$"+Math.round(v/1000)+"k"})}</div>
+  <div class="grid g2 mt">${chartCard("lsRent","Rent comparison","Estimated 1-BR rent near the hospital, $/month (lowest at top).")}${chartCard("lsSal","Salary comparison","Estimated PGY-1 base salary.")}${chartCard("lsWeather","Weather score","1–10, warmer and sunnier scores higher.")}${chartCard("lsAir","Airport convenience","1–10, size of airport and nonstop options.")}${chartCard("lsHappy","Resident happiness","1–10, from reputation and interview-day impressions.")}${chartCard("lsLife","Lifestyle composite","Average of weather, dining, shopping, walkability, safety, outdoors, entertainment (0–100).")}</div>`;
+  const o={onClick:id=>go("profiles",id)};
+  hbar($("#lsRent"),progItems(p=>p.rent,{asc:true}),{...o,fmt:v=>"$"+(v/1000).toFixed(1)+"k"});
+  hbar($("#lsSal"),progItems(p=>p.salary),{...o,fmt:v=>"$"+Math.round(v/1000)+"k"});
+  hbar($("#lsWeather"),progItems(p=>p.weather),{...o,max:10});
+  hbar($("#lsAir"),progItems(p=>p.airport),{...o,max:10});
+  hbar($("#lsHappy"),progItems(p=>p.residentHappiness),{...o,max:10});
+  hbar($("#lsLife"),progItems(p=>p.lifestyle*10),{...o,max:100});
+};
+
+/* ================= NEURO ================= */
+RENDER.neuro=function(){
+  const v=$("#v-neuro");const charts=[["stroke","Stroke strength"],["neuroICU","Neuro ICU strength"],["epilepsy","Epilepsy strength"],["movementDisorders","Movement disorders"],["ms","MS / neuroimmunology"],["neuromuscular","Neuromuscular"],["research","Research"],["fellowships","Fellowship placement"]];
+  const heat=v=>`background:color-mix(in srgb,var(--seq3) ${Math.round(clamp((v-4)/6,0,1)*85+5)}%,var(--card));color:${v>=8.5?'#fff':'var(--text)'}`;
+  const heads=["Stroke","ICU","Epi","EMU","DBS","Move","MS","NM","HA","Sleep","Cog","Onc"];
+  v.innerHTML=`<div class="vhead"><div><h2>Neurology training explorer</h2><p>Subspecialty strength by program (1–10 estimates). Use these to match programs to the fellowships you might pursue.</p></div></div>
+  <div class="grid g2">${charts.map(c=>chartCard("nc_"+c[0],c[1],"")).join("")}</div>
+  <div class="card mt"><h3>Subspecialty heatmap</h3><p class="sub">Darker = stronger. Sorted by your current overall ranking.</p><div class="tblwrap"><table class="tbl"><thead><tr><th>Program</th>${heads.map(h=>`<th style="text-align:center">${h}</th>`).join("")}</tr></thead><tbody>${byRank().map(p=>`<tr><td><a href="#" onclick="go('profiles','${p.id}');return false">${esc(p.name)}</a></td>${NEURO_KEYS.map((k,i)=>`<td style="text-align:center;${heat(p[k])}" data-tip="<b>${esc(p.name)}</b>${esc(FIELDS[k])}: ${p[k]}">${p[k]}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  charts.forEach(c=>hbar($("#nc_"+c[0]),progItems(p=>p[c[0]],{hl:top3()}).sort((a,b)=>b.value-a.value||PM[a.id].rank-PM[b.id].rank),{max:10,rowH:22,onClick:id=>go("profiles",id)}));
+};
+
+/* ================= FINANCE ================= */
+RENDER.finance=function(){
+  const v=$("#v-finance");const top=byRank().slice(0,4);const yrs=["Start","PGY-1","PGY-2","PGY-3","PGY-4"];
+  const cum=p=>{let c=0,out=[0];for(let y=0;y<4;y++){const s=p.salary*Math.pow(1.03,y);const net=s-fedTax(s)-s*.0765-s*p.stateTax/100;c+=net-p.rent*12*Math.pow(1.03,y)-p.otherCost*Math.pow(1.03,y);out.push(c)}return out};
+  const sorted=P.slice().sort((a,b)=>b.savings-a.savings);
+  v.innerHTML=`<div class="vhead"><div><h2>Finance</h2><p>How far does the paycheck go? Take-home = salary − federal tax (2025 brackets, standard deduction) − FICA − state/local estimate. Non-rent living costs are scaled from a $21k/yr national baseline by each city's cost-of-living index.</p></div><span class="estimate">All dollar figures are estimates</span></div>
+  <div class="grid g2">${chartCard("fCol","Cost of living","Index, US average = 100. Cheapest at top.")}${chartCard("fSav","Savings potential","Estimated money left per year after taxes, rent and living costs.")}${chartCard("fPP","Salary purchasing power","Take-home pay adjusted for cost of living (in national-average dollars).")}
+  <div class="card"><h3>4-year cumulative savings</h3><p class="sub">Your current top 4, assuming ~3% raises and ~3% cost growth per year.</p>${lineChart(top.map((p,i)=>({name:p.name,color:SERIES[i],values:cum(p)})),yrs,{fy:v=>kmoney(v)})}${legend(top.map((p,i)=>({name:p.name,color:SERIES[i]})))}</div></div>
+  <div class="card mt"><h3>Take-home breakdown</h3><p class="sub">Sorted by savings potential. State tax shown where applicable.</p><div class="tblwrap"><table class="tbl"><thead><tr><th>Program</th><th>Salary</th><th>Federal</th><th>FICA</th><th>State/local</th><th>Take-home</th><th>Rent/yr</th><th>Rent % of pay</th><th>Savings/yr</th></tr></thead><tbody>${sorted.map(p=>`<tr><td>${esc(p.name)}<div class="small muted">${esc(p.taxNote)}</div></td><td>${kmoney(p.salary)}</td><td>${kmoney(p.fed)}</td><td>${kmoney(p.fica)}</td><td>${p.stateTax?kmoney(p.stateTaxAmt)+` <span class="muted small">(${p.stateTax}%)</span>`:'<span class="muted">none</span>'}</td><td><b>${kmoney(p.net)}</b></td><td>${kmoney(p.annualRent)}</td><td>${Math.round(p.rentPct)}%</td><td class="${p.savings===sorted[0].savings?'best':''}">${kmoney(p.savings)}</td></tr>`).join("")}</tbody></table></div></div>`;
+  const o={onClick:id=>go("profiles",id)};
+  hbar($("#fCol"),progItems(p=>p.col,{asc:true}),{...o,max:200});
+  hbar($("#fSav"),progItems(p=>Math.max(0,p.savings)),{...o,fmt:kmoney,tip:it=>`<b>${esc(it.label)}</b>${kmoney(PM[it.id].savings)} / yr`});
+  hbar($("#fPP"),progItems(p=>p.purchasing),{...o,fmt:kmoney});
+};
+
+/* ================= PROFILES ================= */
+let editOpen=false;
+function skyline(id){let h=hash(id),s="",x=0;while(x<800){h=(h*1103515245+12345)>>>0;const w=30+h%50,ht=40+(h>>>8)%120;s+=`<rect x="${x}" y="${200-ht}" width="${w-4}" height="${ht}" fill="#fff"/>`;x+=w}return `<svg class="sky" viewBox="0 0 800 200" preserveAspectRatio="none">${s}</svg>`}
+RENDER.profiles=function(){
+  const v=$("#v-profiles");const p=PM[S.profile]||P[0];const i=BASE.findIndex(b=>b.id===p.id);
+  const prev=BASE[(i+BASE.length-1)%BASE.length].id,next=BASE[(i+1)%BASE.length].id;const g=S.gut[p.id];
+  const fin=[["Salary (PGY-1)",money(p.salary)],["Rent",money(p.rent)+"/mo"],["Federal + FICA",money(p.fed+p.fica)],["State/local tax",p.stateTax?money(p.stateTaxAmt)+` (${p.stateTax}%)`:"None"],["Take-home",money(p.net)],["Purchasing power",money(p.purchasing)],["Savings potential",money(p.savings)+"/yr"]];
+  v.innerHTML=`<div class="row profnav" style="margin-bottom:12px"><button class="btn" onclick="go('profiles','${prev}')">‹ Prev</button>${progSelect("profSel",p.id,"go('profiles',this.value)")}<button class="btn" onclick="go('profiles','${next}')">Next ›</button></div>
+  <div class="hero">${skyline(p.id)}<span class="ph">Photo / logo placeholder</span><div class="inner"><div class="crest">${esc(p.abbr)}</div><div style="flex:1;min-width:200px"><h2>${esc(p.name)}</h2><div>${esc(p.city)}, ${esc(p.state)}</div><div class="chips"><span>#${p.rank} overall</span><span>Score ${Math.round(p.overall)}</span><span>Match happiness ${Math.round(p.matchHappy)}${p.matchHappyRated?'':' est.'}</span>${p.familyMiles!=null?`<span>${Math.round(p.familyMiles)} mi from family</span>`:''}</div></div></div></div>
+  <div class="grid g2 mt"><div class="card"><h3>Quick summary</h3><p class="small">${esc(p.description)}</p><div class="small muted" style="margin-bottom:6px">Best for</div>${p.bestFor.map(b=>`<span class="tag">${esc(b)}</span>`).join("")}</div>
+   <div class="card"><h3>Reputation</h3><div class="meters mt" style="grid-template-columns:1fr">${meter("Prestige",p.prestige)}${meter("Academic reputation",p.academic)}${meter("Research",p.research)}${meter("Fellowship placement",p.fellowships)}</div></div>
+   <div class="card"><h3>Strengths</h3><ul class="clean small">${p.strengths.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+   <div class="card"><h3>Tradeoffs</h3><ul class="clean small">${p.concerns.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div></div>
+  <div class="card mt"><h3>Neurology training</h3><p class="sub">1–10 estimates by subspecialty.</p><div class="meters">${NEURO_KEYS.map(k=>meter(FIELDS[k],p[k])).join("")}</div></div>
+  <div class="grid g2 mt"><div class="card"><h3>Resident life</h3><div class="meters mt" style="grid-template-columns:1fr">${meter("Happiness",p.residentHappiness)}${meter("Camaraderie",p.camaraderie)}${meter("Faculty support",p.facultySupport)}${meter("Mentorship",p.mentorship)}${meter("Wellness",p.wellness)}${meter("Burnout risk (lower is better)",p.burnoutRisk,true)}</div></div>
+   <div class="card"><h3>Financial analysis</h3><table class="tbl mt">${fin.map(f=>`<tr><td>${f[0]}</td><td>${f[1]}</td></tr>`).join("")}</table><p class="small muted">${esc(p.taxNote)}. Estimates only.</p></div></div>
+  <div class="card mt"><h3>Lifestyle</h3><div class="meters mt">${meter("Weather",p.weather)}${meter("Food scene",p.dining)}${meter("Shopping",p.shopping)}${meter("Walkability",p.walkability)}${meter("Safety",p.safety)}${meter("Airport access",p.airport)}${meter("Outdoor activities",p.outdoor)}${meter("Entertainment",p.entertainment)}</div></div>
+  <div class="grid g2 mt"><div class="card" style="border-left:4px solid var(--good)"><h3>Who would love it</h3><p class="small">${esc(p.loves)}</p></div><div class="card" style="border-left:4px solid var(--warn)"><h3>Think carefully if…</h3><p class="small">${esc(p.careful)}</p></div></div>
+  <div class="card mt"><div class="row"><h3>Your take</h3><span class="spacer"></span><button class="btn" onclick="go('notes','${p.id}')">Open notes</button><button class="btn" onclick="S.gutSel='${p.id}';go('matchday')">Gut check</button></div><p class="small">${g&&Object.keys(g).length?`Gut-check answers: ${GUT_Q.map(q=>`${esc(q[1])} <b>${g[q[0]]??'—'}</b>`).join(" · ")}`:'You haven\'t done the Match Day gut check for this program yet.'}</p>${(S.notes[p.id]&&S.notes[p.id].green)?`<p class="small"><b>Green flags:</b> ${esc(S.notes[p.id].green)}</p>`:''}${(S.notes[p.id]&&S.notes[p.id].red)?`<p class="small"><b>Red flags:</b> ${esc(S.notes[p.id].red)}</p>`:''}</div>
+  <div class="card mt"><details id="editDet" ${editOpen?'open':''}><summary>Edit data for ${esc(p.name)} ${S.overrides[p.id]?'<span class="tag" style="margin-left:6px">edited</span>':''}</summary>
+   <p class="small muted">These are starter estimates. Replace them with real numbers (salary from the program website, rent you found, your own 1–10 impressions). Changes save automatically and update every score.</p>
+   <div class="editgrid">${Object.entries(MONEY).map(([k,l])=>`<div><label>${esc(l)}</label><input type="number" inputmode="decimal" step="any" data-k="${k}" value="${p[k]}"></div>`).join("")}${RATING_KEYS.map(k=>`<div><label>${esc(FIELDS[k])}</label><input type="number" inputmode="numeric" min="1" max="10" step="1" data-k="${k}" value="${p[k]}"></div>`).join("")}</div>
+   <div class="row mt"><button class="btn" onclick="resetProg('${p.id}')">Reset this program to defaults</button></div></details></div>`;
+  $("#editDet").addEventListener("toggle",e=>editOpen=e.target.open);
+  $$("#editDet input").forEach(inp=>inp.addEventListener("change",()=>{const val=parseFloat(inp.value);if(isNaN(val))return;const k=inp.dataset.k;const nv=RATING_KEYS.includes(k)?clamp(val,1,10):val;(S.overrides[p.id]=S.overrides[p.id]||{})[k]=nv;save();recompute();const y=scrollY;RENDER.profiles();scrollTo(0,y)}));
+};
+window.resetProg=id=>{delete S.overrides[id];save();recompute();RENDER.profiles()};
+
+/* ================= MATCH DAY ================= */
+let simBusy=false;
+RENDER.matchday=function(){
+  const v=$("#v-matchday");const id=S.gutSel||"hopkins";const g=S.gut[id]||{};const rated=P.filter(p=>p.matchHappyRated);
+  const placed=id=>S.tiers[id]||"unsorted";
+  v.innerHTML=`<div class="vhead"><div><h2>Match Day</h2><p>Trust your gut. Rate how each program feels, build tiers, and practice opening the envelope.</p></div></div>
+  <div class="grid g2"><div class="card"><h3>Match happiness predictor</h3><p class="sub">Score each question 1–10. All four answered = a Match Happiness Score.</p>
+    <div class="row" style="margin-bottom:10px">${progSelect("gutSel",id,"S.gutSel=this.value;save();RENDER.matchday()")}</div>
+    <div class="gq">${GUT_Q.map(q=>`<div><label class="small" for="gq_${q[0]}"><b>${esc(q[1])}</b></label><input type="range" min="1" max="10" id="gq_${q[0]}" data-q="${q[0]}" value="${g[q[0]]??5}" style="${g[q[0]]==null?'opacity:.5':''}"></div><div class="num" style="font-weight:800;font-size:1.2rem;text-align:center" id="gqv_${q[0]}">${g[q[0]]??'—'}</div>`).join("")}</div>
+    <div class="row mt"><div><div class="small muted">Match Happiness Score</div><div class="gauge num" id="gutScore">${PM[id].matchHappyRated?Math.round(PM[id].matchHappy):'—'}</div></div><span class="spacer"></span><button class="btn" onclick="delete S.gut[S.gutSel];save();recompute();RENDER.matchday()">Clear</button></div></div>
+   <div class="card"><h3>Your happiness scores</h3><p class="sub">${rated.length} of 18 rated. Unrated programs aren't shown.</p><div id="gutChart">${rated.length?'':'<p class="muted small">Rate a program to start this chart.</p>'}</div></div></div>
+  <div class="card mt sim"><div class="envelope">Dream Match simulator</div><div class="simname" id="simName">✉️ Ready?</div><div class="small muted" id="simSub">Picks a program, weighted toward the top of <a href="#" onclick="go('rankings');return false">your rank list</a>.</div><div class="row" style="justify-content:center;margin-top:14px"><button class="btn primary" id="simBtn">Open the envelope</button></div><div class="react" id="simReact" style="display:none">${[["thrilled","🤩 Thrilled"],["happy","🙂 Happy"],["neutral","😐 Neutral"],["disappointed","😞 Disappointed"]].map(r=>`<button class="pill" data-r="${r[0]}">${r[1]}</button>`).join("")}</div></div>
+  <div class="card mt"><h3>Your reactions so far</h3><p class="sub">Gut reactions are data. A "disappointed" may mean that program belongs lower on your list.</p><div id="reactLog"></div></div>
+  <div class="card mt"><h3>Tier builder</h3><p class="sub">Drag programs into tiers. On a phone: tap a program, then tap a tier.</p>
+   <div class="tiers">${[...TIERS,["unsorted","Not yet placed"]].map(t=>`<div class="tier" data-tier="${t[0]}"><h4><span>${t[1]}</span><span class="muted">${P.filter(p=>placed(p.id)===t[0]).length}</span></h4><div class="chipz">${byRank().filter(p=>placed(p.id)===t[0]).map(p=>`<div class="chip" draggable="true" data-id="${p.id}">${esc(p.name)}</div>`).join("")}</div></div>`).join("")}</div></div>`;
+  $$("#v-matchday [data-q]").forEach(inp=>inp.addEventListener("input",()=>{(S.gut[id]=S.gut[id]||{})[inp.dataset.q]=+inp.value;inp.style.opacity=1;$("#gqv_"+inp.dataset.q).textContent=inp.value;save();recompute();$("#gutScore").textContent=PM[id].matchHappyRated?Math.round(PM[id].matchHappy):'—';drawGut()}));
+  drawGut();drawReacts();
+  // tiers
+  let selChip=null;
+  $$("#v-matchday .chip").forEach(c=>{c.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",c.dataset.id)});c.addEventListener("click",e=>{e.stopPropagation();if(selChip===c){c.classList.remove("sel");selChip=null;$$(".tier").forEach(t=>t.classList.remove("target"));return}$$(".chip.sel").forEach(x=>x.classList.remove("sel"));selChip=c;c.classList.add("sel");$$(".tier").forEach(t=>t.classList.add("target"))})});
+  $$("#v-matchday .tier").forEach(t=>{t.addEventListener("dragover",e=>{e.preventDefault();t.classList.add("over")});t.addEventListener("dragleave",()=>t.classList.remove("over"));
+    t.addEventListener("drop",e=>{e.preventDefault();const pid=e.dataTransfer.getData("text/plain");if(pid){S.tiers[pid]=t.dataset.tier;save();keepY(RENDER.matchday)}});
+    t.addEventListener("click",()=>{if(selChip){S.tiers[selChip.dataset.id]=t.dataset.tier;save();keepY(RENDER.matchday)}})});
+  // simulator
+  let current=null;
+  $("#simBtn").onclick=()=>{if(simBusy)return;simBusy=true;const l=myList();const w=l.map((_,i)=>Math.pow(0.72,i));const tot=w.reduce((a,b)=>a+b);let r=Math.random()*tot,pick=l[0];for(let i=0;i<l.length;i++){r-=w[i];if(r<=0){pick=l[i];break}}
+    $("#simReact").style.display="none";let n=0;const iv=setInterval(()=>{$("#simName").textContent=PM[l[Math.floor(Math.random()*l.length)]].name;if(++n>14){clearInterval(iv);simBusy=false;current=pick;const p=PM[pick];$("#simName").textContent="🎉 "+p.name;$("#simSub").textContent=`${p.city}, ${p.state} · #${l.indexOf(pick)+1} on your list. How do you feel?`;$("#simReact").style.display="flex";$("#simBtn").textContent="Simulate again"}},70)};
+  $("#simReact").onclick=e=>{const b=e.target.closest("[data-r]");if(!b||!current)return;(S.reactions[current]=S.reactions[current]||[]).push(b.dataset.r);save();$("#simReact").style.display="none";$("#simSub").textContent="Reaction saved.";drawReacts()};
+};
+function keepY(f){const y=scrollY;f();scrollTo(0,y)}
+function drawGut(){const rated=P.filter(p=>p.matchHappyRated);const el=$("#gutChart");if(!rated.length)return;el.innerHTML="";hbar(el,rated.map(p=>({id:p.id,label:lab(p),value:p.matchHappy})).sort((a,b)=>b.value-a.value),{max:100,onClick:id=>{S.gutSel=id;save();RENDER.matchday()}})}
+function drawReacts(){const em={thrilled:"🤩",happy:"🙂",neutral:"😐",disappointed:"😞"};const ids=Object.keys(S.reactions).filter(id=>PM[id]&&S.reactions[id].length);
+  $("#reactLog").innerHTML=ids.length?`<table class="tbl"><thead><tr><th>Program</th><th>Reactions</th><th>Latest</th></tr></thead><tbody>${ids.map(id=>`<tr><td>${esc(PM[id].name)}</td><td style="text-align:right">${S.reactions[id].map(r=>em[r]).join(" ")}</td><td>${S.reactions[id].slice(-1)[0]}</td></tr>`).join("")}</tbody></table><div class="row mt"><button class="btn" onclick="S.reactions={};save();drawReacts()">Clear reactions</button></div>`:'<p class="muted small">No simulated matches yet.</p>'}
+window.drawReacts=drawReacts;window.RENDER=RENDER;window.recompute=recompute;
+
+/* ================= NOTES ================= */
+RENDER.notes=function(){
+  const v=$("#v-notes");const id=S.notesSel;const n=S.notes[id]||{};const p=PM[id];
+  const counts=BASE.map(b=>({id:b.id,name:b.name,c:NOTE_FIELDS.filter(f=>(S.notes[b.id]||{})[f[0]]).length}));
+  v.innerHTML=`<div class="vhead"><div><h2>Interview notes</h2><p>Saved automatically in this browser as you type.</p></div></div>
+  <div class="card"><div class="row">${progSelect("noteSel",id,"go('notes',this.value)")}<span class="saved" id="savedMsg">✓ Saved</span><span class="spacer"></span><button class="btn" onclick="go('profiles','${id}')">View profile</button></div>
+   <div class="row mt">${counts.map(c=>`<button class="pill ${c.id===id?'on':''}" onclick="go('notes','${c.id}')">${esc(c.name)}${c.c?` · ${c.c}`:''}</button>`).join("")}</div></div>
+  <div class="grid g2 mt">${NOTE_FIELDS.map(f=>`<div class="card"><label class="fl" for="n_${f[0]}">${f[1]}</label><textarea id="n_${f[0]}" data-f="${f[0]}" placeholder="${esc(f[1])} for ${esc(p.name)}…">${esc(n[f[0]]||"")}</textarea></div>`).join("")}</div>
+  <div class="card mt"><h3>Backup &amp; move between devices</h3><p class="sub">Your notes, weights, rank list, tiers and data edits live only in this browser. Export a backup file to keep them safe or open them on another phone or computer.</p>
+   <div class="row"><button class="btn primary" id="expBtn">Export backup</button><label class="btn" style="display:inline-block">Import backup<input type="file" id="impFile" accept=".json,application/json" style="display:none"></label><button class="btn" id="copyBk">Copy backup text</button><span class="spacer"></span><button class="btn" id="resetAll" style="color:var(--bad)">Reset everything</button></div><p class="small muted" id="bkMsg"></p><details class="mt"><summary class="small">Restore from pasted backup text</summary><textarea id="bkText" class="mt" placeholder="Paste backup text here"></textarea><div class="row mt"><button class="btn" id="bkRestore">Restore</button></div></details></div>`;
+  let t;$$("#v-notes textarea").forEach(ta=>ta.addEventListener("input",()=>{(S.notes[id]=S.notes[id]||{})[ta.dataset.f]=ta.value;save();const m=$("#savedMsg");m.classList.add("on");clearTimeout(t);t=setTimeout(()=>m.classList.remove("on"),1200)}));
+  $("#expBtn").onclick=()=>{const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="residency-explorer-backup-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);$("#bkMsg").textContent="Backup downloaded."};
+  $("#impFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);Object.assign(S,defaults(),o);S.weights=Object.assign({...DEFAULT_W},o.weights||{});save();recompute();applyTheme();RENDER.notes();$("#bkMsg").textContent="Backup imported."}catch(err){$("#bkMsg").textContent="That file couldn't be read as a backup."}};r.readAsText(f)};
+  const applyBk=txt=>{const o=JSON.parse(txt);Object.assign(S,defaults(),o);S.weights=Object.assign({...DEFAULT_W},o.weights||{});save();recompute();applyTheme();RENDER.notes();$("#bkMsg").textContent="Backup restored."};
+  $("#copyBk").onclick=()=>{const txt=JSON.stringify(S);const done=()=>$("#bkMsg").textContent="Backup text copied. Paste it into a note or message to keep it.";const fb=()=>{const d=$("#v-notes details");d.open=true;const ta=$("#bkText");ta.value=txt;ta.select();$("#bkMsg").textContent="Copy the selected text below to keep it."};try{navigator.clipboard.writeText(txt).then(done,fb)}catch(e){fb()}};
+  $("#bkRestore").onclick=()=>{try{applyBk($("#bkText").value)}catch(e){$("#bkMsg").textContent="That text isn't a valid backup. Paste the whole thing and try again."}};
+  let armed=false;$("#resetAll").onclick=()=>{if(!armed){armed=true;$("#resetAll").textContent="Tap again to erase all";setTimeout(()=>{armed=false;const b=$("#resetAll");if(b)b.textContent="Reset everything"},3000);return}const th=S.theme;Object.keys(S).forEach(k=>delete S[k]);Object.assign(S,defaults(),{theme:th});save();recompute();RENDER.notes();$("#bkMsg").textContent="Everything reset to defaults."};
+};
+
+/* ================= BOOT ================= */
+{const nj=$("#nojs");if(nj)nj.remove()}
+if(S.bannerHidden){const b=$("#estBanner");if(b)b.remove()}
+recompute();
+window.addEventListener("resize",()=>{if(S.tab==="maps"){const g=$("#mapGrid");if(g)g.style.gridTemplateColumns=innerWidth<760?"minmax(0,1fr)":"minmax(0,2fr) minmax(0,1fr)"}});
+go(TABS.some(t=>t[0]===S.tab)?S.tab:"dashboard");
+</script>
+</body>
+</html>
